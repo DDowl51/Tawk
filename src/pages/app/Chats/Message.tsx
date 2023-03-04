@@ -9,7 +9,6 @@ import {
   Button,
   Dropdown,
 } from 'antd';
-import type { MenuProps } from 'antd';
 import type { ItemType } from 'antd/es/menu/hooks/useItems';
 import Icon from '@ant-design/icons';
 import { Download, File } from 'phosphor-react';
@@ -22,7 +21,7 @@ import {
   ImgMessage,
   FileMessage,
   LinkMessage,
-} from '../../data';
+} from '../../../data';
 
 type MessageProps = {
   message: MessageType;

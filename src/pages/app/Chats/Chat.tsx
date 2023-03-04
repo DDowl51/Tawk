@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 import Avatar from '../../../components/Avatar';
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
 import ChatInput from './ChatInput';
-import MessageList from '../../../components/MessagePanel/MessageList';
+import MessageList from './MessageList';
 
 const Chat = () => {
   const { token } = theme.useToken();

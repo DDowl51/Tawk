@@ -13,7 +13,7 @@ import { CircleDashed, MagnifyingGlass, ArchiveBox } from 'phosphor-react';
 import SimpleBarStyle from '../../../components/SimpleBarStyle';
 
 import { ChatList as CHATLIST } from '../../../data';
-import ChatListItem from '../../../components/ChatList/ChatListItem';
+import ChatListItem from './ChatListItem';
 
 const ChatList = () => {
   const { token } = theme.useToken();
@@ -25,8 +25,6 @@ const ChatList = () => {
         padding: 24,
         height: '100%',
         width: 320,
-        backgroundColor: token.colorBgLayout,
-        boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
       }}
     >
       <Space size={16} direction='vertical' style={{ width: '100%' }}>
@@ -43,13 +41,14 @@ const ChatList = () => {
         </Row>
         <Input
           prefix={<Icon component={() => <MagnifyingGlass />} />}
-          size='middle'
+          size='large'
           placeholder='Search...'
         />
         <Button
           type='text'
-          style={{ color: token.colorPrimary }}
-          icon={<Icon component={() => <ArchiveBox />} />}
+          size='large'
+          style={{ color: token.colorPrimary, fontWeight: 'bold' }}
+          icon={<Icon component={() => <ArchiveBox size={18} />} />}
         >
           Archive
         </Button>

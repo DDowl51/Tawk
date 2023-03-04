@@ -11,10 +11,10 @@ const ROOTS_AUTH = path('/', 'auth');
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
   app: {
-    chat: path(ROOTS_DASHBOARD, 'chat'),
+    chats: path(ROOTS_DASHBOARD, 'chats'),
     settings: path(ROOTS_DASHBOARD, 'settings'),
-    group: path(ROOTS_DASHBOARD, 'group'),
-    call: path(ROOTS_DASHBOARD, 'call'),
+    groups: path(ROOTS_DASHBOARD, 'groups'),
+    calls: path(ROOTS_DASHBOARD, 'calls'),
     profile: path(ROOTS_DASHBOARD, 'profile'),
   },
 };

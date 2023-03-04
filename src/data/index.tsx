@@ -1,5 +1,15 @@
 import { faker } from '@faker-js/faker';
 
+export interface CallLogType {
+  id: number;
+  img: string;
+  name: string;
+  time: string;
+  incoming: boolean;
+  missed: boolean;
+  online: boolean;
+}
+
 const CallLogs = [
   {
     id: 0,
@@ -74,6 +84,13 @@ const CallLogs = [
     online: false,
   },
 ];
+
+export interface MemberType {
+  id: number;
+  img: string;
+  name: string;
+  online: boolean;
+}
 
 const MembersList = [
   {

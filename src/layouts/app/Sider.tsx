@@ -32,22 +32,22 @@ const getItem = (
 const siderMenus: MenuItem[] = [
   getItem(
     'Chat',
-    PATH_DASHBOARD.app.chat,
-    <NavLink to={PATH_DASHBOARD.app.chat}>
+    PATH_DASHBOARD.app.chats,
+    <NavLink to={PATH_DASHBOARD.app.chats}>
       <ChatCircleDots />
     </NavLink>
   ),
   getItem(
     'Group',
-    PATH_DASHBOARD.app.group,
-    <NavLink to={PATH_DASHBOARD.app.group}>
+    PATH_DASHBOARD.app.groups,
+    <NavLink to={PATH_DASHBOARD.app.groups}>
       <Users />
     </NavLink>
   ),
   getItem(
     'Call',
-    PATH_DASHBOARD.app.call,
-    <NavLink to={PATH_DASHBOARD.app.call}>
+    PATH_DASHBOARD.app.calls,
+    <NavLink to={PATH_DASHBOARD.app.calls}>
       <Phone />
     </NavLink>
   ),
@@ -89,7 +89,7 @@ const Sider = () => {
           />
         </div>
         <Menu
-          style={{ width: '100%' }}
+          style={{ width: '100%', backgroundColor: 'transparent' }}
           selectedKeys={[location.pathname]}
           items={siderMenus}
         />

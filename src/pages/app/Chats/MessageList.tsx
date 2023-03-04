@@ -1,7 +1,7 @@
 import { List } from 'antd';
 
-import { Chat_History } from '../../data';
-import SimpleBarStyle from '../SimpleBarStyle';
+import { Chat_History } from '../../../data/index';
+import SimpleBarStyle from '../../../components/SimpleBarStyle';
 import Message from './Message';
 
 const MessageList = () => {

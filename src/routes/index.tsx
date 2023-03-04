@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 import Loading from '../components/Loading';
-import { PATH_DASHBOARD } from './path';
+import { PATH_AUTH, PATH_DASHBOARD } from './path';
 
 // Layouts
 
@@ -17,17 +17,44 @@ const Loadable = (Component: React.FC) => (props: any) => {
 
 export default function Router() {
   return useRoutes([
+    { path: '/', element: <Navigate to={PATH_DASHBOARD.app.chats} /> },
     {
       path: PATH_DASHBOARD.root,
       element: <AppLayout />,
       children: [
-        { path: PATH_DASHBOARD.app.chat, element: <ChatPage /> },
+        {
+          path: PATH_DASHBOARD.root,
+          element: <Navigate to={PATH_DASHBOARD.app.chats} />,
+        },
+        { path: PATH_DASHBOARD.app.chats, element: <ChatsPage /> },
+        { path: PATH_DASHBOARD.app.groups, element: <GroupsPage /> },
+        { path: PATH_DASHBOARD.app.calls, element: <CallsPage /> },
+        { path: PATH_DASHBOARD.app.settings, element: <SettingsPage /> },
         { path: '*', element: <NotFoundPage /> },
       ],
     },
+    {
+      path: PATH_AUTH.root,
+      element: <AuthLayout />,
+      children: [
+        { path: PATH_AUTH.auth.login, element: <LoginPage /> },
+        { path: PATH_AUTH.auth.register, element: <RegisterPage /> },
+      ],
+    },
+    { path: '*', element: <NotFoundPage /> },
   ]);
 }
 
+// App Routes
 const AppLayout = Loadable(lazy(() => import('../layouts/app')));
-const ChatPage = Loadable(lazy(() => import('../pages/app/Chat')));
+const ChatsPage = Loadable(lazy(() => import('../pages/app/Chats')));
+const GroupsPage = Loadable(lazy(() => import('../pages/app/Groups')));
+const CallsPage = Loadable(lazy(() => import('../pages/app/Calls')));
+const SettingsPage = Loadable(lazy(() => import('../pages/app/Settings')));
+
+// Auth Routes
+const AuthLayout = Loadable(lazy(() => import('../layouts/auth')));
+const LoginPage = Loadable(lazy(() => import('../pages/auth/Login')));
+const RegisterPage = Loadable(lazy(() => import('../pages/auth/Register')));
+
 const NotFoundPage = Loadable(lazy(() => import('../pages/NotFound')));
