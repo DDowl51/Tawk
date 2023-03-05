@@ -2,8 +2,8 @@ import { Button, Row, Space, theme, Typography } from 'antd';
 import Icon from '@ant-design/icons';
 import { ArrowDownLeft, ArrowUpRight, Phone } from 'phosphor-react';
 import { FC } from 'react';
-import { CallLogType } from '../../../data';
-import Avatar from '../../../components/Avatar';
+import { CallLogType } from 'data';
+import Avatar from 'components/Avatar';
 
 type CallListItemProps = {
   item: CallLogType;

@@ -1,9 +1,23 @@
 import { Form, Input, Row, Typography, Button } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { AppDispatch } from 'store';
+import { Register } from 'store/auth/auth.action';
+import { selectAuth } from 'store/auth/auth.slice';
 
 const RegisterForm = () => {
-  const handleSubmit = (values: any) => {
-    console.log(values);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    register: { loading },
+  } = useSelector(selectAuth);
+
+  const handleSubmit = (formValues: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
+    dispatch(Register(formValues));
   };
 
   return (
@@ -44,6 +58,7 @@ const RegisterForm = () => {
       </Form.Item>
 
       <Button
+        loading={loading}
         style={{ width: '100%', marginBottom: 16 }}
         type='primary'
         htmlType='submit'

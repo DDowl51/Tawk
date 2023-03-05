@@ -1,7 +1,7 @@
 import { Space, Typography } from 'antd';
 import { Link } from 'react-router-dom';
-import { PATH_AUTH } from '../../../routes/path';
-import AuthSocial from '../Login/AuthSocial';
+import { PATH_AUTH } from 'routes/path';
+import AuthSocial from '../AuthSocial';
 import RegisterForm from './RegisterForm';
 
 const Register = () => {

@@ -1,7 +1,7 @@
 import { Layout, theme, Row, Space, Typography, Button, Divider } from 'antd';
 import Icon from '@ant-design/icons';
 import { faker } from '@faker-js/faker';
-import Avatar from '../../../components/Avatar';
+import Avatar from 'components/Avatar';
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';

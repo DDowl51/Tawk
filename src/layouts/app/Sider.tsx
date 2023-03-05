@@ -1,17 +1,37 @@
 import React from 'react';
-import { Menu, Col, Row, Image, theme, Avatar, Switch, Space } from 'antd';
+import {
+  Menu,
+  Col,
+  Row,
+  Image,
+  theme,
+  Avatar,
+  Switch,
+  Space,
+  Dropdown,
+} from 'antd';
 import type { MenuProps } from 'antd';
-import { ChatCircleDots, Users, Phone, GearSix } from 'phosphor-react';
-import { NavLink } from 'react-router-dom';
-import { useLocation } from 'react-router';
+import {
+  ChatCircleDots,
+  Users,
+  Phone,
+  GearSix,
+  User,
+  SignOut,
+} from 'phosphor-react';
+import { Link, NavLink } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
-import { PATH_DASHBOARD } from '../../routes/path';
+import { PATH_DASHBOARD } from 'routes/path';
 import { faker } from '@faker-js/faker';
 import { useDispatch, useSelector } from 'react-redux';
-import { SwitchMode } from '../../store/settings/settings.action';
-import { AppDispatch } from '../../store';
-import { selectSettings } from '../../store/settings/settings.slice';
-// import Logo from '../../assets/images/logo.ico';
+import { SwitchMode } from 'store/settings/settings.action';
+import { AppDispatch } from 'store';
+import { selectSettings } from 'store/settings/settings.slice';
+import Icon from '@ant-design/icons';
+import { useMemo } from 'react';
+import { logout } from 'store/auth/auth.slice';
+// import Logo from 'assets/images/logo.ico';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -19,6 +39,7 @@ const getItem = (
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
+  onClick?: () => void,
   children?: MenuItem[]
 ): MenuItem => {
   return {
@@ -26,6 +47,7 @@ const getItem = (
     icon,
     children,
     label,
+    onClick,
   };
 };
 
@@ -34,21 +56,21 @@ const siderMenus: MenuItem[] = [
     'Chat',
     PATH_DASHBOARD.app.chats,
     <NavLink to={PATH_DASHBOARD.app.chats}>
-      <ChatCircleDots />
+      <ChatCircleDots size={16} />
     </NavLink>
   ),
   getItem(
     'Group',
     PATH_DASHBOARD.app.groups,
     <NavLink to={PATH_DASHBOARD.app.groups}>
-      <Users />
+      <Icon component={() => <Users size={18} />} />
     </NavLink>
   ),
   getItem(
     'Call',
     PATH_DASHBOARD.app.calls,
     <NavLink to={PATH_DASHBOARD.app.calls}>
-      <Phone />
+      <Icon component={() => <Phone size={18} />} />
     </NavLink>
   ),
   { type: 'divider' },
@@ -56,15 +78,40 @@ const siderMenus: MenuItem[] = [
     'Setting',
     PATH_DASHBOARD.app.settings,
     <NavLink to={PATH_DASHBOARD.app.settings}>
-      <GearSix />
+      <Icon component={() => <GearSix size={18} />} />
     </NavLink>
   ),
 ];
+
 const Sider = () => {
   const location = useLocation();
   const { token } = theme.useToken();
   const dispatch = useDispatch<AppDispatch>();
   const settings = useSelector(selectSettings);
+  const navigate = useNavigate();
+
+  const profileMenu = useMemo(() => {
+    return [
+      getItem(
+        'Profile',
+        PATH_DASHBOARD.app.profile,
+        <Icon component={() => <User size={16} />} />,
+        () => navigate(PATH_DASHBOARD.app.profile)
+      ),
+      getItem(
+        'Settings',
+        `${PATH_DASHBOARD.app.settings}-profile`,
+        <Icon component={() => <GearSix size={16} />} />,
+        () => navigate(PATH_DASHBOARD.app.settings)
+      ),
+      getItem(
+        'Logout',
+        'logout',
+        <Icon component={() => <SignOut size={16} />} />,
+        () => dispatch(logout())
+      ),
+    ];
+  }, [navigate, dispatch]);
 
   return (
     <div
@@ -84,7 +131,7 @@ const Sider = () => {
             height='64px'
             width='64px'
             preview={false}
-            src={require('../../assets/images/logo.ico')}
+            src={require('assets/images/logo.ico')}
             alt='Logo'
           />
         </div>
@@ -102,7 +149,13 @@ const Sider = () => {
           />
         </Row>
         <Row justify='center'>
-          <Avatar size='large' src={faker.image.avatar()} />
+          <Dropdown
+            placement='topLeft'
+            menu={{ items: profileMenu }}
+            trigger={['contextMenu']}
+          >
+            <Avatar size='large' src={faker.image.avatar()} />
+          </Dropdown>
         </Row>
       </Space>
     </div>

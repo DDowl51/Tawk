@@ -11,9 +11,9 @@ import {
 import { useState } from 'react';
 import Icon from '@ant-design/icons';
 import { MagnifyingGlass, Plus } from 'phosphor-react';
-import SimpleBarStyle from '../../../components/SimpleBarStyle';
+import SimpleBarStyle from 'components/SimpleBarStyle';
 
-import { ChatList as CHATLIST } from '../../../data';
+import { ChatList as CHATLIST } from 'data';
 import ChatListItem from '../Chats/ChatListItem';
 import CreateGroupModal from './CreateGroupModal';
 

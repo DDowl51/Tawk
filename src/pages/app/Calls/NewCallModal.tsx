@@ -2,9 +2,9 @@ import { FC } from 'react';
 import { Input, Modal, Space } from 'antd';
 import { MagnifyingGlass } from 'phosphor-react';
 
-import { MembersList } from '../../../data';
+import { MembersList } from 'data';
 import NewCallItem from './NewCallItem';
-import SimpleBarStyle from '../../../components/SimpleBarStyle';
+import SimpleBarStyle from 'components/SimpleBarStyle';
 
 type NewCallModalType = {
   open: boolean;
@@ -23,7 +23,7 @@ const NewCallModal: FC<NewCallModalType> = ({ open, handleCancel }) => {
       <SimpleBarStyle style={{ height: 500 }}>
         <Space direction='vertical' size={8} style={{ width: '100%' }}>
           {MembersList.map(item => (
-            <NewCallItem item={item} />
+            <NewCallItem key={item.id} item={item} />
           ))}
         </Space>
       </SimpleBarStyle>

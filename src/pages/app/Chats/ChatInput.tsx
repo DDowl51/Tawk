@@ -1,4 +1,4 @@
-import { Row, Button, Input, Popover, Space, Tooltip, theme } from 'antd';
+import { Row, Button, Input, Popover, Space, Tooltip } from 'antd';
 import Icon from '@ant-design/icons';
 import {
   Plus,
@@ -13,7 +13,7 @@ import {
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { useSelector } from 'react-redux';
-import { selectSettings } from '../../../store/settings/settings.slice';
+import { selectSettings } from 'store/settings/settings.slice';
 
 const Actions = [
   {

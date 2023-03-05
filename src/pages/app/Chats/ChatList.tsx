@@ -10,9 +10,9 @@ import {
 } from 'antd';
 import Icon from '@ant-design/icons';
 import { CircleDashed, MagnifyingGlass, ArchiveBox } from 'phosphor-react';
-import SimpleBarStyle from '../../../components/SimpleBarStyle';
+import SimpleBarStyle from 'components/SimpleBarStyle';
 
-import { ChatList as CHATLIST } from '../../../data';
+import { ChatList as CHATLIST } from 'data';
 import ChatListItem from './ChatListItem';
 
 const ChatList = () => {

@@ -1,9 +1,9 @@
-import { Button, Row, Space, theme, Typography } from 'antd';
+import { Button, Row, theme, Typography } from 'antd';
 import { FC } from 'react';
 import Icon from '@ant-design/icons';
 
-import { MemberType } from '../../../data';
-import Avatar from '../../../components/Avatar';
+import { MemberType } from 'data';
+import Avatar from 'components/Avatar';
 import { Phone, VideoCamera } from 'phosphor-react';
 
 type NewCallItemProps = {

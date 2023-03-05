@@ -3,7 +3,7 @@ import { Col, Row, Space, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 
-import Avatar from '../../../components/Avatar';
+import Avatar from 'components/Avatar';
 import {
   Bell,
   Image,

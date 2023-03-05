@@ -39,6 +39,7 @@ export default function Router() {
       children: [
         { path: PATH_AUTH.auth.login, element: <LoginPage /> },
         { path: PATH_AUTH.auth.register, element: <RegisterPage /> },
+        { path: PATH_AUTH.auth.verify, element: <VerifyPage /> },
       ],
     },
     { path: '*', element: <NotFoundPage /> },
@@ -56,5 +57,6 @@ const SettingsPage = Loadable(lazy(() => import('../pages/app/Settings')));
 const AuthLayout = Loadable(lazy(() => import('../layouts/auth')));
 const LoginPage = Loadable(lazy(() => import('../pages/auth/Login')));
 const RegisterPage = Loadable(lazy(() => import('../pages/auth/Register')));
+const VerifyPage = Loadable(lazy(() => import('../pages/auth/Verify')));
 
 const NotFoundPage = Loadable(lazy(() => import('../pages/NotFound')));

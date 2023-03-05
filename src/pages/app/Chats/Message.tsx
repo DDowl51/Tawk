@@ -14,6 +14,7 @@ import Icon from '@ant-design/icons';
 import { Download, File } from 'phosphor-react';
 import { TextProps } from 'antd/es/typography/Text';
 
+import findTextColor from 'utils/findTextColor';
 import {
   MessageType,
   DividerMessage,
@@ -21,7 +22,7 @@ import {
   ImgMessage,
   FileMessage,
   LinkMessage,
-} from '../../../data';
+} from 'data';
 
 type MessageProps = {
   message: MessageType;
@@ -34,11 +35,13 @@ const Text: FC<PropsWithChildren<{ isSender: boolean } & TextProps>> = ({
 }) => {
   const { token } = theme.useToken();
 
+  const textColor = findTextColor(token.colorPrimary, '#e9ecef', '#343a40');
+
   return (
     <Typography.Text
       style={{
         fontWeight: 'bold',
-        color: isSender ? token.colorTextLightSolid : token.colorText,
+        color: isSender ? textColor : token.colorText,
       }}
       ellipsis={props.ellipsis}
     >

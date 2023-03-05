@@ -62,7 +62,7 @@ const Shortcut: FC<ShortcutProps> = ({ shortcut }) => {
   return (
     <Row>
       {keys.map(key => (
-        <Tag>{key}</Tag>
+        <Tag style={{ userSelect: 'none' }}>{key}</Tag>
       ))}
     </Row>
   );

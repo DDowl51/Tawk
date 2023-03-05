@@ -16,6 +16,8 @@ import {
 } from 'redux-persist';
 
 import settingsReducer from './settings/settings.slice';
+import authReducer from './auth/auth.slice';
+import uiReducer from './ui/ui.slice';
 
 const persistConfig = {
   key: 'root',
@@ -24,6 +26,8 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   settings: settingsReducer,
+  auth: authReducer,
+  ui: uiReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

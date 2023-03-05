@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Typography, Row, Col, theme } from 'antd';
-import Avatar from '../../../components/Avatar';
+import Avatar from 'components/Avatar';
 
 type ChatListItemProps = {
   user: {

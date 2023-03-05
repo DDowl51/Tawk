@@ -14,9 +14,7 @@ const AuthSocial = () => {
         <Button
           shape='circle'
           size='large'
-          icon={
-            <Icon component={() => <GithubLogo size={20} color='black' />} />
-          }
+          icon={<Icon component={() => <GithubLogo size={20} />} />}
         />
         <Button
           shape='circle'

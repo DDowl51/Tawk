@@ -1,4 +1,4 @@
-import { Action, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '..';
 
 export interface SettingsState {
@@ -15,16 +15,22 @@ const initialState: SettingsState = {
   },
 };
 
-const settingsSlice = createSlice({
+const slice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
     setMode(state, action: PayloadAction<typeof initialState.theme.mode>) {
       state.theme.mode = action.payload;
     },
+    setPrimaryColor(
+      state,
+      action: PayloadAction<typeof initialState.theme.colorPrimary>
+    ) {
+      state.theme.colorPrimary = action.payload;
+    },
   },
 });
 
 export const selectSettings = (state: RootState) => state.settings;
-export const { setMode } = settingsSlice.actions;
-export default settingsSlice.reducer;
+export const { setMode, setPrimaryColor } = slice.actions;
+export default slice.reducer;

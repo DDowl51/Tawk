@@ -1,8 +1,15 @@
 import { Layout } from 'antd';
 import Sider from './Sider';
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectAuth } from 'store/auth/auth.slice';
+import { PATH_AUTH } from 'routes/path';
 
 const AppLayout = () => {
+  const { authenticated } = useSelector(selectAuth);
+
+  if (!authenticated) return <Navigate to={PATH_AUTH.auth.login} />;
+
   return (
     <Layout style={{ height: '100vh' }}>
       <Layout.Sider theme='light' collapsible defaultCollapsed>

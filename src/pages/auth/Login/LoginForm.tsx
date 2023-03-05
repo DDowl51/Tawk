@@ -1,11 +1,19 @@
 import { Button, Form, Input, Row, Typography } from 'antd';
-import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { PATH_AUTH } from '../../../routes/path';
+import { AppDispatch } from 'store';
+import { PATH_AUTH } from 'routes/path';
+import { Login } from 'store/auth/auth.action';
+import { selectAuth } from 'store/auth/auth.slice';
 
 const LoginForm = () => {
-  const handleSubmit = (values: any) => {
-    console.log(values);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    login: { loading },
+  } = useSelector(selectAuth);
+
+  const handleSubmit = (values: { email: string; password: string }) => {
+    dispatch(Login(values));
   };
 
   return (
@@ -23,7 +31,12 @@ const LoginForm = () => {
         </Typography.Text>
       </Row>
 
-      <Button style={{ width: '100%' }} type='primary' htmlType='submit'>
+      <Button
+        loading={loading}
+        style={{ width: '100%' }}
+        type='primary'
+        htmlType='submit'
+      >
         Login
       </Button>
     </Form>

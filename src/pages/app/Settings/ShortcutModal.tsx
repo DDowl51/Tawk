@@ -1,7 +1,7 @@
 import { Col, Row, theme, Typography } from 'antd';
 import Modal from 'antd/es/modal/Modal';
 import { FC } from 'react';
-import Shortcut from '../../../components/Shortcuts';
+import Shortcut from 'components/Shortcuts';
 
 type ShortcutModalProps = {
   open: boolean;
@@ -110,7 +110,7 @@ const ShortcutModal: FC<ShortcutModalProps> = ({ open, handleCancel }) => {
     >
       <Row gutter={[32, 16]} style={{ marginTop: 32 }}>
         {list.map(item => (
-          <Col span={12}>
+          <Col key={item.key} span={12}>
             <Row justify='space-between' wrap={false} align='middle'>
               <Typography.Text style={{ fontWeight: 'bold' }}>
                 {item.title}

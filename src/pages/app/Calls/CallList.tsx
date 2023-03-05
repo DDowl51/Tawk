@@ -11,9 +11,9 @@ import {
 import { useState } from 'react';
 import Icon from '@ant-design/icons';
 import { MagnifyingGlass, Plus } from 'phosphor-react';
-import SimpleBarStyle from '../../../components/SimpleBarStyle';
+import SimpleBarStyle from 'components/SimpleBarStyle';
 
-import { CallLogs } from '../../../data';
+import { CallLogs } from 'data';
 import CallListItem from './CallListItem';
 import NewCallModal from './NewCallModal';
 // import CreateGroupModal from './CreateGroupModal';
