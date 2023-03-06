@@ -24,8 +24,10 @@ import {
   LinkMessage,
 } from 'data';
 
-type MessageProps = {
-  message: MessageType;
+type MessageProps<MsgType extends MessageType> = {
+  message: MsgType;
+  enableMenu?: boolean;
+  fullWidth?: boolean;
 };
 
 const Text: FC<PropsWithChildren<{ isSender: boolean } & TextProps>> = ({
@@ -79,15 +81,26 @@ const messageMenu: ItemType[] = [
   getItem('Delete Message', 'delete-message'),
 ];
 
-const MessageBody: FC<PropsWithChildren<{ isSender: boolean }>> = ({
+type MessageBodyProps = {
+  isSender: boolean;
+  enableMenu?: boolean;
+  fullWidth?: boolean;
+};
+
+const MessageBody: FC<PropsWithChildren<MessageBodyProps>> = ({
   children,
   isSender,
+  enableMenu = true,
+  fullWidth = false,
 }) => {
   const { token } = theme.useToken();
 
   return (
     <Row justify={isSender ? 'end' : 'start'}>
-      <Dropdown menu={{ items: messageMenu }} trigger={['contextMenu']}>
+      <Dropdown
+        menu={{ items: messageMenu }}
+        trigger={enableMenu ? ['contextMenu'] : []}
+      >
         <Row
           style={{
             padding: 8,
@@ -96,7 +109,8 @@ const MessageBody: FC<PropsWithChildren<{ isSender: boolean }>> = ({
             backgroundColor: isSender
               ? token.colorPrimary
               : token.colorBgElevated,
-            maxWidth: '70%',
+            width: fullWidth ? '100%' : undefined,
+            maxWidth: fullWidth ? '100%' : '70%',
           }}
         >
           {children}
@@ -106,11 +120,19 @@ const MessageBody: FC<PropsWithChildren<{ isSender: boolean }>> = ({
   );
 };
 
-const MessageText: FC<{ message: TextMessage }> = ({ message }) => {
+const MessageText: FC<MessageProps<TextMessage>> = ({
+  message,
+  enableMenu,
+  fullWidth,
+}) => {
   const { token } = theme.useToken();
 
   return (
-    <MessageBody isSender={message.isSender}>
+    <MessageBody
+      isSender={message.isSender}
+      enableMenu={enableMenu}
+      fullWidth={fullWidth}
+    >
       <Space direction='vertical'>
         {message.quote && (
           <Space
@@ -134,9 +156,17 @@ const MessageText: FC<{ message: TextMessage }> = ({ message }) => {
   );
 };
 
-const MessageImage: FC<{ message: ImgMessage }> = ({ message }) => {
+const MessageImage: FC<MessageProps<ImgMessage>> = ({
+  message,
+  enableMenu,
+  fullWidth,
+}) => {
   return (
-    <MessageBody isSender={message.isSender}>
+    <MessageBody
+      isSender={message.isSender}
+      enableMenu={enableMenu}
+      fullWidth={fullWidth}
+    >
       <Space direction='vertical'>
         <Image
           placeholder
@@ -150,27 +180,41 @@ const MessageImage: FC<{ message: ImgMessage }> = ({ message }) => {
   );
 };
 
-const MessageFile: FC<{ message: FileMessage }> = ({ message }) => {
+const MessageFile: FC<MessageProps<FileMessage>> = ({
+  message,
+  enableMenu,
+  fullWidth,
+}) => {
   const { token } = theme.useToken();
 
   return (
-    <MessageBody isSender={message.isSender}>
-      <Space direction='vertical'>
+    <MessageBody
+      isSender={message.isSender}
+      enableMenu={enableMenu}
+      fullWidth={fullWidth}
+    >
+      <Space direction='vertical' style={{ width: '100%' }}>
         <Row
+          wrap={false}
           align='middle'
           justify='space-between'
           style={{
             borderRadius: 8,
             padding: 8,
             border: `1px solid ${token.colorTextQuaternary}`,
-            width: 200,
+            width: fullWidth ? '100%' : 200,
           }}
         >
-          <Row style={{ gap: 8, marginRight: 8 }} align='middle'>
+          <Row style={{ gap: 8 }} align='middle' wrap={false}>
             <Icon component={() => <File size={24} />} />
-            <Space.Compact direction='vertical'>
+            <Space.Compact direction='vertical' style={{ width: '80%' }}>
               <Typography.Text
-                style={{ fontWeight: 'bold', fontSize: 16, padding: 0 }}
+                ellipsis={{ tooltip: message.fileinfo.filename }}
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: 14,
+                  padding: 0,
+                }}
               >
                 {message.fileinfo.filename}
               </Typography.Text>
@@ -183,6 +227,7 @@ const MessageFile: FC<{ message: FileMessage }> = ({ message }) => {
             </Space.Compact>
           </Row>
           <Button
+            style={{ padding: 4 }}
             type='text'
             icon={<Icon component={() => <Download size={18} />} />}
           />
@@ -193,11 +238,19 @@ const MessageFile: FC<{ message: FileMessage }> = ({ message }) => {
   );
 };
 
-const MessageLink: FC<{ message: LinkMessage }> = ({ message }) => {
+const MessageLink: FC<MessageProps<LinkMessage>> = ({
+  message,
+  enableMenu,
+  fullWidth,
+}) => {
   const { token } = theme.useToken();
 
   return (
-    <MessageBody isSender={message.isSender}>
+    <MessageBody
+      isSender={message.isSender}
+      enableMenu={enableMenu}
+      fullWidth={fullWidth}
+    >
       <Space direction='vertical'>
         <Space
           direction='vertical'
@@ -208,7 +261,11 @@ const MessageLink: FC<{ message: LinkMessage }> = ({ message }) => {
             width: 200,
           }}
         >
-          <Image preview={false} src={message.preview} />
+          <Image
+            style={{ display: 'block' }}
+            preview={false}
+            src={message.preview}
+          />
           <Typography.Link target='_blank' href={message.link} rel='noreferrer'>
             {message.link}
           </Typography.Link>
@@ -219,7 +276,11 @@ const MessageLink: FC<{ message: LinkMessage }> = ({ message }) => {
   );
 };
 
-const Message: FC<MessageProps> = ({ message }) => {
+const Message: FC<MessageProps<MessageType>> = ({
+  message,
+  enableMenu,
+  fullWidth,
+}) => {
   return (
     <>
       {(() => {
@@ -229,15 +290,45 @@ const Message: FC<MessageProps> = ({ message }) => {
           case 'msg': {
             switch (message.subtype) {
               case 'text':
-                return <MessageText message={message} />;
+                return (
+                  <MessageText
+                    message={message}
+                    enableMenu={enableMenu}
+                    fullWidth={fullWidth}
+                  />
+                );
               case 'img':
-                return <MessageImage message={message} />;
+                return (
+                  <MessageImage
+                    message={message}
+                    enableMenu={enableMenu}
+                    fullWidth={fullWidth}
+                  />
+                );
               case 'file':
-                return <MessageFile message={message} />;
+                return (
+                  <MessageFile
+                    message={message}
+                    enableMenu={enableMenu}
+                    fullWidth={fullWidth}
+                  />
+                );
               case 'link':
-                return <MessageLink message={message} />;
+                return (
+                  <MessageLink
+                    message={message}
+                    enableMenu={enableMenu}
+                    fullWidth={fullWidth}
+                  />
+                );
               default:
-                return <MessageText message={message} />;
+                return (
+                  <MessageText
+                    message={message}
+                    enableMenu={enableMenu}
+                    fullWidth={fullWidth}
+                  />
+                );
             }
           }
         }

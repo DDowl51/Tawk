@@ -12,7 +12,7 @@ const AppLayout = () => {
 
   return (
     <Layout style={{ height: '100vh' }}>
-      <Layout.Sider theme='light' collapsible defaultCollapsed>
+      <Layout.Sider width={120} theme='light' collapsible defaultCollapsed>
         <Sider />
       </Layout.Sider>
       <Layout.Content style={{ height: '100vh' }}>

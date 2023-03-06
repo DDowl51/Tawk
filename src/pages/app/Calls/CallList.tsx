@@ -74,7 +74,7 @@ const CallList = () => {
         >
           <Space direction='vertical' style={{ width: '100%' }} size={16}>
             {CallLogs.map(item => (
-              <CallListItem item={item} />
+              <CallListItem key={item.id} item={item} />
             ))}
           </Space>
         </SimpleBarStyle>

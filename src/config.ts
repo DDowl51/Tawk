@@ -1,5 +1,4 @@
 import { ThemeConfig, theme } from 'antd';
-import findTextColor from './utils/findTextColor';
 
 const basicTheme = (primaryColor: string): ThemeConfig => ({
   token: {

@@ -5,74 +5,90 @@ import Avatar from 'components/Avatar';
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from 'store';
+import { SwitchChatSider } from 'store/ui/ui.action';
+import ChatSider from './ChatSider';
 
 const Chat = () => {
   const { token } = theme.useToken();
+  const dispatch = useDispatch<AppDispatch>();
 
   const ONLINE = Math.random() > 0.5;
 
   return (
-    <Layout style={{ height: '100%' }}>
-      <Layout.Header
-        style={{
-          backgroundColor: token.colorBgElevated,
-          boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
-          padding: 16,
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <Row
-          justify='space-between'
-          style={{ width: '100%', alignItems: 'center' }}
+    <Layout style={{ height: '100%' }} hasSider>
+      <Layout>
+        <Layout.Header
+          style={{
+            backgroundColor: token.colorBgElevated,
+            boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
+            padding: 16,
+            display: 'flex',
+            alignItems: 'center',
+          }}
         >
-          <Row style={{ alignItems: 'center', gap: 12 }}>
-            <Avatar src={faker.image.avatar()} alt='user' online={ONLINE} />
-            <Space.Compact direction='vertical' style={{ lineHeight: 1 }}>
-              <Typography.Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                {faker.name.fullName()}
-              </Typography.Text>
-              <Typography.Text
-                type='secondary'
-                style={{ fontSize: 8, fontWeight: 'bold' }}
-              >
-                {ONLINE ? 'Online' : 'Offline'}
-              </Typography.Text>
-            </Space.Compact>
+          <Row
+            justify='space-between'
+            style={{ width: '100%', alignItems: 'center' }}
+          >
+            <Row style={{ alignItems: 'center', gap: 12 }}>
+              <Avatar
+                style={{ cursor: 'pointer' }}
+                onClick={() => dispatch(SwitchChatSider())}
+                src={faker.image.avatar()}
+                alt='user'
+                online={ONLINE}
+              />
+              <Space.Compact direction='vertical' style={{ lineHeight: 1 }}>
+                <Typography.Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                  {faker.name.fullName()}
+                </Typography.Text>
+                <Typography.Text
+                  type='secondary'
+                  style={{ fontSize: 8, fontWeight: 'bold' }}
+                >
+                  {ONLINE ? 'Online' : 'Offline'}
+                </Typography.Text>
+              </Space.Compact>
+            </Row>
+            <Row align='middle' style={{ gap: 8 }}>
+              <Button
+                shape='circle'
+                icon={<Icon component={() => <VideoCamera />} />}
+              />
+              <Button
+                shape='circle'
+                icon={<Icon component={() => <Phone />} />}
+              />
+              <Button
+                shape='circle'
+                icon={<Icon component={() => <MagnifyingGlass />} />}
+              />
+              <Divider type='vertical' />
+              <Button
+                shape='circle'
+                icon={<Icon component={() => <CaretDown />} />}
+              />
+            </Row>
           </Row>
-          <Row align='middle' style={{ gap: 8 }}>
-            <Button
-              shape='circle'
-              icon={<Icon component={() => <VideoCamera />} />}
-            />
-            <Button
-              shape='circle'
-              icon={<Icon component={() => <Phone />} />}
-            />
-            <Button
-              shape='circle'
-              icon={<Icon component={() => <MagnifyingGlass />} />}
-            />
-            <Divider type='vertical' />
-            <Button
-              shape='circle'
-              icon={<Icon component={() => <CaretDown />} />}
-            />
-          </Row>
-        </Row>
-      </Layout.Header>
-      <Layout.Content>
-        <MessageList />
-      </Layout.Content>
-      <Layout.Footer
-        style={{
-          padding: 16,
-          backgroundColor: token.colorBgContainer,
-          boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
-        }}
-      >
-        <ChatInput />
-      </Layout.Footer>
+        </Layout.Header>
+        <Layout.Content>
+          <MessageList />
+        </Layout.Content>
+        <Layout.Footer
+          style={{
+            padding: 16,
+            backgroundColor: token.colorBgContainer,
+            boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
+          }}
+        >
+          <ChatInput />
+        </Layout.Footer>
+      </Layout>
+
+      {/* Chat Sider to show contact info */}
+      <ChatSider />
     </Layout>
   );
 };

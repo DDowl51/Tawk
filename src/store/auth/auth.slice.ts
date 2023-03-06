@@ -38,10 +38,12 @@ const slice = createSlice({
     login(state, action: PayloadAction<{ userId: string; token: string }>) {
       state.authenticated = true;
       state.userId = action.payload.userId;
+      state.token = action.payload.token;
     },
     logout(state) {
       state.authenticated = false;
       state.userId = '';
+      state.token = '';
     },
     //- Register reducers
     setRegisterLoading(state, action: PayloadAction<boolean>) {

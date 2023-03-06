@@ -19,7 +19,7 @@ import {
   User,
   SignOut,
 } from 'phosphor-react';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router';
 
 import { PATH_DASHBOARD } from 'routes/path';
@@ -154,7 +154,12 @@ const Sider = () => {
             menu={{ items: profileMenu }}
             trigger={['contextMenu']}
           >
-            <Avatar size='large' src={faker.image.avatar()} />
+            <Avatar
+              onClick={() => navigate(PATH_DASHBOARD.app.profile)}
+              style={{ cursor: 'pointer' }}
+              size='large'
+              src={faker.image.avatar()}
+            />
           </Dropdown>
         </Row>
       </Space>

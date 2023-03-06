@@ -14,6 +14,9 @@ import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { useSelector } from 'react-redux';
 import { selectSettings } from 'store/settings/settings.slice';
+import { useState } from 'react';
+import { useAppDispatch } from 'store';
+import { SetSnackbar } from 'store/ui/ui.action';
 
 const Actions = [
   {
@@ -42,7 +45,7 @@ const AttachOptions = () => {
   return (
     <Space direction='vertical'>
       {Actions.map(action => (
-        <Tooltip placement='right' title={action.title}>
+        <Tooltip key={action.title} placement='right' title={action.title}>
           <Button
             type='primary'
             shape='circle'
@@ -57,6 +60,16 @@ const AttachOptions = () => {
 
 const ChatInput = () => {
   const { theme } = useSelector(selectSettings);
+  const dispatch = useAppDispatch();
+  const [sendLoading, setSendLoading] = useState(false);
+
+  const handleSend = () => {
+    setSendLoading(true);
+    setTimeout(() => {
+      setSendLoading(false);
+      dispatch(SetSnackbar(true, 'success', 'Message sent!'));
+    }, 2000);
+  };
 
   return (
     <>
@@ -75,12 +88,17 @@ const ChatInput = () => {
           mouseLeaveDelay={0.2}
           placement='topRight'
           content={<Picker data={data} theme={theme.mode} />}
-          title=''
           autoAdjustOverflow
         >
           <Button size='large' icon={<Icon component={() => <Smiley />} />} />
         </Popover>
-        <Button type='primary' size='large'>
+        <Button
+          onClick={handleSend}
+          type='primary'
+          size='large'
+          //! TEMP!
+          loading={sendLoading}
+        >
           Send
           <Icon component={() => <PaperPlaneTilt />} />
         </Button>

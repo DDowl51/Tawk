@@ -30,6 +30,7 @@ export default function Router() {
         { path: PATH_DASHBOARD.app.groups, element: <GroupsPage /> },
         { path: PATH_DASHBOARD.app.calls, element: <CallsPage /> },
         { path: PATH_DASHBOARD.app.settings, element: <SettingsPage /> },
+        { path: PATH_DASHBOARD.app.profile, element: <ProfilePage /> },
         { path: '*', element: <NotFoundPage /> },
       ],
     },
@@ -52,6 +53,7 @@ const ChatsPage = Loadable(lazy(() => import('../pages/app/Chats')));
 const GroupsPage = Loadable(lazy(() => import('../pages/app/Groups')));
 const CallsPage = Loadable(lazy(() => import('../pages/app/Calls')));
 const SettingsPage = Loadable(lazy(() => import('../pages/app/Settings')));
+const ProfilePage = Loadable(lazy(() => import('../pages/app/Profile')));
 
 // Auth Routes
 const AuthLayout = Loadable(lazy(() => import('../layouts/auth')));

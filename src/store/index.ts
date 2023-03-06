@@ -18,6 +18,7 @@ import {
 import settingsReducer from './settings/settings.slice';
 import authReducer from './auth/auth.slice';
 import uiReducer from './ui/ui.slice';
+import { useDispatch } from 'react-redux';
 
 const persistConfig = {
   key: 'root',
@@ -50,5 +51,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
+
+export const useAppDispatch = useDispatch<AppDispatch>;
 
 export default store;

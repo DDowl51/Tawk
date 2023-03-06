@@ -1,5 +1,5 @@
 import { AppThunk } from '..';
-import { setSnackbar } from './ui.slice';
+import { setChatSider, setSnackbar } from './ui.slice';
 
 export const SetSnackbar =
   (
@@ -9,4 +9,25 @@ export const SetSnackbar =
   ): AppThunk =>
   (dispatch, _getState) => {
     dispatch(setSnackbar({ open, type, message }));
+  };
+
+export const SwitchChatSider =
+  (open?: boolean): AppThunk =>
+  (dispatch, getState) => {
+    const chatSider = getState().ui.chatSider;
+    dispatch(
+      setChatSider({
+        open: open ? open : !chatSider.open,
+        type: chatSider.type,
+      })
+    );
+  };
+
+export const SetChatSider =
+  (
+    open: boolean,
+    type: 'contact' | 'starred' | 'shared' = 'contact'
+  ): AppThunk =>
+  (dispatch, _getState) => {
+    dispatch(setChatSider({ open, type }));
   };

@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Avatar as AntAvatar, Badge, AvatarProps } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 
 const Avatar: FC<AvatarProps & { online?: boolean }> = ({
   online,
@@ -15,6 +16,7 @@ const Avatar: FC<AvatarProps & { online?: boolean }> = ({
       style={{ width: 8, height: 8 }}
     >
       <AntAvatar
+        icon={<UserOutlined />}
         size={props.size || 48}
         src={props.src}
         alt={props.alt}

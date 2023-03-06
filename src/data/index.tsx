@@ -284,7 +284,6 @@ const Chat_History: MessageType[] = [
     message: 'Ya sure, sending you a pic',
     isSender: false,
   },
-
   {
     type: 'msg',
     subtype: 'img',
@@ -343,6 +342,13 @@ const Chat_History: MessageType[] = [
     message: 'This is a reply',
     isSender: true,
   },
+  {
+    type: 'msg',
+    subtype: 'img',
+    message: 'Another cat image',
+    img: faker.image.cats(),
+    isSender: true,
+  },
 ];
 
 const Message_options = [
@@ -366,54 +372,81 @@ const Message_options = [
   },
 ];
 
-const Shared_Links = [
+const Shared_Links: LinkMessage[] = [
   {
     type: 'msg',
     subtype: 'link',
+    link: 'https://www.bilibili.com',
     preview: faker.image.cats(),
     message: 'Yep, I can also do that',
-    incoming: true,
-    outgoing: false,
+    isSender: false,
   },
   {
     type: 'msg',
     subtype: 'link',
+    link: 'Https://www.youtube.com',
     preview: faker.image.cats(),
     message: 'Yep, I can also do that',
-    incoming: true,
-    outgoing: false,
+    isSender: false,
   },
   {
     type: 'msg',
     subtype: 'link',
+    link: 'HTTPS://www.baidu.com',
     preview: faker.image.cats(),
     message: 'Yep, I can also do that',
-    incoming: true,
-    outgoing: false,
+    isSender: false,
   },
 ];
 
-const Shared_Docs = [
+const Shared_Docs: FileMessage[] = [
   {
     type: 'msg',
-    subtype: 'doc',
+    subtype: 'file',
     message: 'Yes sure, here you go.',
-    incoming: true,
-    outgoing: false,
+    file: 'Filename',
+    fileinfo: { filename: 'Some very longlonglong filename.txt', filesize: 12 },
+    isSender: false,
   },
   {
     type: 'msg',
-    subtype: 'doc',
+    subtype: 'file',
     message: 'Yes sure, here you go.',
-    incoming: true,
-    outgoing: false,
+    file: 'Filename',
+    fileinfo: { filename: 'My Passwords.txt', filesize: 7 },
+    isSender: false,
   },
   {
     type: 'msg',
-    subtype: 'doc',
+    subtype: 'file',
     message: 'Yes sure, here you go.',
-    incoming: true,
-    outgoing: false,
+    file: 'Filename',
+    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+    isSender: false,
+  },
+  {
+    type: 'msg',
+    subtype: 'file',
+    message: 'Yes sure, here you go.',
+    file: 'Filename',
+    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+    isSender: false,
+  },
+  {
+    type: 'msg',
+    subtype: 'file',
+    message: 'Yes sure, here you go.',
+    file: 'Filename',
+    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+    isSender: false,
+  },
+  {
+    type: 'msg',
+    subtype: 'file',
+    message: 'Yes sure, here you go.',
+    file: 'Filename',
+    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+    isSender: false,
   },
 ];
 
