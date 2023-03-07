@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { FileMessage, LinkMessage, MessageType } from 'types';
 
 export interface CallLogType {
   id: number;
@@ -214,141 +215,102 @@ const ChatList = [
   },
 ];
 
-export interface BaseMessage {
-  type: 'msg' | 'divider';
-}
-
-export interface DividerMessage extends BaseMessage {
-  type: 'divider';
-  text: string;
-}
-
-export interface NormalMessage extends BaseMessage {
-  type: 'msg';
-  subtype: 'text' | 'img' | 'file' | 'link';
-  isSender: boolean;
-  message: string;
-  quote?: NormalMessage;
-}
-
-export interface TextMessage extends NormalMessage {
-  subtype: 'text';
-}
-export interface ImgMessage extends NormalMessage {
-  subtype: 'img';
-  img: string;
-}
-export interface FileMessage extends NormalMessage {
-  subtype: 'file';
-  fileinfo: { filename: string; filesize: number };
-  file: string;
-}
-export interface LinkMessage extends NormalMessage {
-  subtype: 'link';
-  link: string;
-  preview: string;
-}
-export type MessageType =
-  | TextMessage
-  | ImgMessage
-  | FileMessage
-  | LinkMessage
-  | DividerMessage;
-
 const Chat_History: MessageType[] = [
-  {
-    type: 'msg',
-    subtype: 'text',
-    message: 'Hi 👋🏻, How are ya ?',
-    isSender: false,
-  },
-  {
-    type: 'divider',
-    text: 'Today',
-  },
-  {
-    type: 'msg',
-    subtype: 'text',
-    message: 'Hi 👋 Panda, not bad, u ?',
-    isSender: true,
-  },
-  {
-    type: 'msg',
-    subtype: 'text',
-    message: 'Can you send me an abstarct image?',
-    isSender: true,
-  },
-  {
-    type: 'msg',
-    subtype: 'text',
-    message: 'Ya sure, sending you a pic',
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'img',
-    message: 'Here You Go',
-    img: faker.image.abstract(),
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'text',
-    message: 'Can you please send this in file format?',
-    isSender: true,
-  },
-  {
-    type: 'msg',
-    subtype: 'text',
-    message:
-      'A very very long text test.A very very long text test.A very very long text test.A very very long textery long textery long textery long textery long textery long text test.A very very long text test.A very very long text test.A very very long text test.',
-    isSender: true,
-  },
-  {
-    type: 'msg',
-    subtype: 'file',
-    message: 'Yes sure, here you go.',
-    file: 'Filename',
-    fileinfo: { filename: 'file.txt', filesize: 12 },
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'file',
-    message:
-      'A very very long text test.A very very long text test.A very very long text test.A very very long textery long textery long textery long textery long textery long text test.A very very long text test.A very very long text test.A very very long text test.',
-    file: 'Filename',
-    fileinfo: { filename: 'file.txt', filesize: 12 },
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'link',
-    preview: faker.image.cats(),
-    link: 'https://www.bilibili.com',
-    message: 'Yep, I can also do that',
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'text',
-    quote: {
-      type: 'msg',
-      subtype: 'text',
-      message:
-        'Yep, I can also do that, Yep, I can also do that, Yep, I can also do that',
-      isSender: false,
-    },
-    message: 'This is a reply',
-    isSender: true,
-  },
-  {
-    type: 'msg',
-    subtype: 'img',
-    message: 'Another cat image',
-    img: faker.image.cats(),
-    isSender: true,
-  },
+  // {
+  //   type: 'msg',
+  //   subtype: 'text',
+  //   message: 'Hi 👋🏻, How are ya ?',
+  //   isSender: false,
+  // },
+  // {
+  //   type: 'divider',
+  //   text: 'Today',
+  //   createdAt: 'Today',
+  //   updatedAt: 'now',
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'text',
+  //   message: 'Hi 👋 Panda, not bad, u ?',
+  //   isSender: true,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'text',
+  //   message: 'Can you send me an abstarct image?',
+  //   isSender: true,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'text',
+  //   message: 'Ya sure, sending you a pic',
+  //   isSender: false,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'img',
+  //   message: 'Here You Go',
+  //   img: faker.image.abstract(),
+  //   isSender: false,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'text',
+  //   message: 'Can you please send this in file format?',
+  //   isSender: true,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'text',
+  //   message:
+  //     'A very very long text test.A very very long text test.A very very long text test.A very very long textery long textery long textery long textery long textery long text test.A very very long text test.A very very long text test.A very very long text test.',
+  //   isSender: true,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'file',
+  //   message: 'Yes sure, here you go.',
+  //   file: 'Filename',
+  //   fileinfo: { filename: 'file.txt', filesize: 12 },
+  //   isSender: false,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'file',
+  //   message:
+  //     'A very very long text test.A very very long text test.A very very long text test.A very very long textery long textery long textery long textery long textery long text test.A very very long text test.A very very long text test.A very very long text test.',
+  //   file: 'Filename',
+  //   fileinfo: { filename: 'file.txt', filesize: 12 },
+  //   isSender: false,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'link',
+  //   preview: faker.image.cats(),
+  //   link: 'https://www.bilibili.com',
+  //   message: 'Yep, I can also do that',
+  //   isSender: false,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'text',
+  //   quote: {
+  //     type: 'msg',
+  //     subtype: 'text',
+  //     message:
+  //       'Yep, I can also do that, Yep, I can also do that, Yep, I can also do that',
+  //     isSender: false,
+  //   },
+  //   message: 'This is a reply',
+  //   isSender: true,
+  // },
+  // {
+  //   type: 'msg',
+  //   subtype: 'img',
+  //   message: 'Another cat image',
+  //   img: faker.image.cats(),
+  //   isSender: true,
+  // },
 ];
 
 const Message_options = [
@@ -373,81 +335,99 @@ const Message_options = [
 ];
 
 const Shared_Links: LinkMessage[] = [
-  {
-    type: 'msg',
-    subtype: 'link',
-    link: 'https://www.bilibili.com',
-    preview: faker.image.cats(),
-    message: 'Yep, I can also do that',
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'link',
-    link: 'Https://www.youtube.com',
-    preview: faker.image.cats(),
-    message: 'Yep, I can also do that',
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'link',
-    link: 'HTTPS://www.baidu.com',
-    preview: faker.image.cats(),
-    message: 'Yep, I can also do that',
-    isSender: false,
-  },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'link',
+  //     link: 'https://www.bilibili.com',
+  //     preview: faker.image.cats(),
+  //     message: 'Yep, I can also do that',
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'link',
+  //     link: 'Https://www.youtube.com',
+  //     preview: faker.image.cats(),
+  //     message: 'Yep, I can also do that',
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'link',
+  //     link: 'HTTPS://www.baidu.com',
+  //     preview: faker.image.cats(),
+  //     message: 'Yep, I can also do that',
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
 ];
 
 const Shared_Docs: FileMessage[] = [
-  {
-    type: 'msg',
-    subtype: 'file',
-    message: 'Yes sure, here you go.',
-    file: 'Filename',
-    fileinfo: { filename: 'Some very longlonglong filename.txt', filesize: 12 },
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'file',
-    message: 'Yes sure, here you go.',
-    file: 'Filename',
-    fileinfo: { filename: 'My Passwords.txt', filesize: 7 },
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'file',
-    message: 'Yes sure, here you go.',
-    file: 'Filename',
-    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'file',
-    message: 'Yes sure, here you go.',
-    file: 'Filename',
-    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'file',
-    message: 'Yes sure, here you go.',
-    file: 'Filename',
-    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
-    isSender: false,
-  },
-  {
-    type: 'msg',
-    subtype: 'file',
-    message: 'Yes sure, here you go.',
-    file: 'Filename',
-    fileinfo: { filename: 'Super secret.txt', filesize: 25 },
-    isSender: false,
-  },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'file',
+  //     message: 'Yes sure, here you go.',
+  //     file: 'Filename',
+  //     fileinfo: { filename: 'Some very longlonglong filename.txt', filesize: 12 },
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'file',
+  //     message: 'Yes sure, here you go.',
+  //     file: 'Filename',
+  //     fileinfo: { filename: 'My Passwords.txt', filesize: 7 },
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'file',
+  //     message: 'Yes sure, here you go.',
+  //     file: 'Filename',
+  //     fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'file',
+  //     message: 'Yes sure, here you go.',
+  //     file: 'Filename',
+  //     fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'file',
+  //     message: 'Yes sure, here you go.',
+  //     file: 'Filename',
+  //     fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
+  //   {
+  //     type: 'msg',
+  //     subtype: 'file',
+  //     message: 'Yes sure, here you go.',
+  //     file: 'Filename',
+  //     fileinfo: { filename: 'Super secret.txt', filesize: 25 },
+  //     isSender: false,
+  //     createdAt: 'now',
+  //     updatedAt: 'now',
+  //   },
 ];
 
 export {

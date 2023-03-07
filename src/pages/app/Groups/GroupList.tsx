@@ -13,8 +13,6 @@ import Icon from '@ant-design/icons';
 import { MagnifyingGlass, Plus } from 'phosphor-react';
 import SimpleBarStyle from 'components/SimpleBarStyle';
 
-import { ChatList as CHATLIST } from 'data';
-import ChatListItem from '../Chats/ChatListItem';
 import CreateGroupModal from './CreateGroupModal';
 
 const GroupList = () => {
@@ -98,9 +96,9 @@ const GroupList = () => {
             </Typography.Title>
             {/* Pinned Groups */}
             <Space direction='vertical' style={{ width: '100%' }} size={16}>
-              {CHATLIST.filter(user => user.pinned).map(user => (
+              {/* {CHATLIST.filter(user => user.pinned).map(user => (
                 <ChatListItem key={user.id} user={user} />
-              ))}
+              ))} */}
             </Space>
             <Typography.Title
               type='secondary'
@@ -116,11 +114,11 @@ const GroupList = () => {
             </Typography.Title>
             {/* All Groups */}
             {
-              <Space direction='vertical' style={{ width: '100%' }} size={16}>
-                {CHATLIST.filter(user => !user.pinned).map(user => (
-                  <ChatListItem key={user.id} user={user} />
-                ))}
-              </Space>
+              // <Space direction='vertical' style={{ width: '100%' }} size={16}>
+              //   {CHATLIST.filter(user => !user.pinned).map(user => (
+              //     <ChatListItem key={user.id} user={user} />
+              //   ))}
+              // </Space>
             }
           </Space>
         </SimpleBarStyle>

@@ -11,6 +11,9 @@ export interface UIState {
     type: 'success' | 'error' | 'warning' | 'info' | 'loading';
     message: string;
   };
+  friendsDialog: {
+    open: boolean;
+  };
 }
 
 const initialState: UIState = {
@@ -22,6 +25,9 @@ const initialState: UIState = {
     open: false,
     type: 'success',
     message: '',
+  },
+  friendsDialog: {
+    open: false,
   },
 };
 
@@ -35,9 +41,12 @@ const slice = createSlice({
     setSnackbar(state, action: PayloadAction<typeof initialState.snackbar>) {
       state.snackbar = action.payload;
     },
+    setFriendsDialog(state, action: PayloadAction<boolean>) {
+      state.friendsDialog.open = action.payload;
+    },
   },
 });
 
 export const selectUI = (state: RootState) => state.ui;
-export const { setSnackbar, setChatSider } = slice.actions;
+export const { setSnackbar, setChatSider, setFriendsDialog } = slice.actions;
 export default slice.reducer;

@@ -11,7 +11,7 @@ const AppLayout = () => {
   if (!authenticated) return <Navigate to={PATH_AUTH.auth.login} />;
 
   return (
-    <Layout style={{ height: '100vh' }}>
+    <Layout style={{ height: '100vh', overflow: 'hidden' }}>
       <Layout.Sider width={120} theme='light' collapsible defaultCollapsed>
         <Sider />
       </Layout.Sider>

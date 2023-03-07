@@ -12,15 +12,19 @@ import Icon from '@ant-design/icons';
 import { MagnifyingGlass, ArchiveBox, Users, Plus } from 'phosphor-react';
 import SimpleBarStyle from 'components/SimpleBarStyle';
 
-import { ChatList as CHATLIST } from 'data';
 import ChatListItem from './ChatListItem';
 import { useState } from 'react';
 import FriendsDialog from './FriendsDialog';
 import AddFriendDialog from './AddFriendDialog';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
+import { useAppDispatch } from 'store';
+import { OpenFriendsDialog } from 'store/ui/ui.action';
 
 const ChatList = () => {
-  const [friendsOpen, setFriendsOpen] = useState(false);
-  const handleFriendsCancel = () => setFriendsOpen(false);
+  const { conversation } = useSelector(selectData);
+  const dispatch = useAppDispatch();
+
   const [addFriendsOpen, setAddFriendsOpen] = useState(false);
   const handleAddFriendsCancel = () => setAddFriendsOpen(false);
 
@@ -43,7 +47,7 @@ const ChatList = () => {
             </Typography.Title>
             <Row>
               <Button
-                onClick={() => setFriendsOpen(true)}
+                onClick={() => dispatch(OpenFriendsDialog())}
                 icon={<Icon component={() => <Users />} />}
                 type='text'
                 size='large'
@@ -76,7 +80,7 @@ const ChatList = () => {
         <SimpleBarStyle
           style={{ height: '100%', overflow: 'auto', color: 'white' }}
         >
-          <Space direction='vertical'>
+          <Space direction='vertical' style={{ width: '100%' }}>
             <Typography.Title
               type='secondary'
               style={{
@@ -90,11 +94,11 @@ const ChatList = () => {
               Pinned
             </Typography.Title>
             {/* Pinned ChatListItem */}
-            <Space direction='vertical' style={{ width: '100%' }} size={16}>
-              {CHATLIST.filter(user => user.pinned).map(user => (
+            {/* <Space direction='vertical' style={{ width: '100%' }} size={16}>
+              {conversation.chatrooms.filter(room => room.pinned).map(user => (
                 <ChatListItem key={user.id} user={user} />
               ))}
-            </Space>
+            </Space> */}
             <Typography.Title
               type='secondary'
               style={{
@@ -110,15 +114,15 @@ const ChatList = () => {
             {/* All ChatListItem */}
             {
               <Space direction='vertical' style={{ width: '100%' }} size={16}>
-                {CHATLIST.filter(user => !user.pinned).map(user => (
-                  <ChatListItem key={user.id} user={user} />
+                {conversation.chatrooms.map(room => (
+                  <ChatListItem key={room._id} chatroom={room} />
                 ))}
               </Space>
             }
           </Space>
         </SimpleBarStyle>
       </Col>
-      <FriendsDialog open={friendsOpen} handleCancel={handleFriendsCancel} />
+      <FriendsDialog />
       <AddFriendDialog
         open={addFriendsOpen}
         handleCancel={handleAddFriendsCancel}

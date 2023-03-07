@@ -27,8 +27,8 @@ const ResultItem: FC<ResultItemProps> = ({ user }) => {
         recipientId: user._id,
       },
       // Callback
-      () => {
-        dispatch(SetSnackbar(true, 'success', 'Request sent'));
+      (request: any) => {
+        dispatch(SetSnackbar(true, 'success', request._id));
       }
     );
   };

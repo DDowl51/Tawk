@@ -16,7 +16,11 @@ import { useSelector } from 'react-redux';
 import { selectSettings } from 'store/settings/settings.slice';
 import { useState } from 'react';
 import { useAppDispatch } from 'store';
-import { SetSnackbar } from 'store/ui/ui.action';
+import { selectData } from 'store/data/data.slice';
+import { useSocket } from 'hooks/useSocket';
+import { MessageType, ServerEvents } from 'types';
+import { selectAuth } from 'store/auth/auth.slice';
+import { AddMessage } from 'store/data/data.action';
 
 const Actions = [
   {
@@ -59,16 +63,28 @@ const AttachOptions = () => {
 };
 
 const ChatInput = () => {
+  const {
+    conversation: { currentChatroomId },
+  } = useSelector(selectData);
   const { theme } = useSelector(selectSettings);
+  const { userId } = useSelector(selectAuth);
   const dispatch = useAppDispatch();
-  const [sendLoading, setSendLoading] = useState(false);
+  const socket = useSocket();
+  const [input, setInput] = useState('');
 
   const handleSend = () => {
-    setSendLoading(true);
-    setTimeout(() => {
-      setSendLoading(false);
-      dispatch(SetSnackbar(true, 'success', 'Message sent!'));
-    }, 2000);
+    socket.emit(
+      ServerEvents.SendMessage,
+      {
+        from: userId,
+        text: input,
+        chatroomId: currentChatroomId,
+      },
+      (message: MessageType) => {
+        dispatch(AddMessage(message));
+      }
+    );
+    setInput('');
   };
 
   return (
@@ -83,7 +99,12 @@ const ChatInput = () => {
         >
           <Button size='large' icon={<Icon component={() => <Plus />} />} />
         </Popover>
-        <Input.TextArea size='large' autoSize={{ minRows: 1, maxRows: 3 }} />
+        <Input.TextArea
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          size='large'
+          autoSize={{ minRows: 1, maxRows: 3 }}
+        />
         <Popover
           mouseLeaveDelay={0.2}
           placement='topRight'
@@ -92,13 +113,7 @@ const ChatInput = () => {
         >
           <Button size='large' icon={<Icon component={() => <Smiley />} />} />
         </Popover>
-        <Button
-          onClick={handleSend}
-          type='primary'
-          size='large'
-          //! TEMP!
-          loading={sendLoading}
-        >
+        <Button onClick={handleSend} type='primary' size='large'>
           Send
           <Icon component={() => <PaperPlaneTilt />} />
         </Button>

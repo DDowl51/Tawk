@@ -30,7 +30,7 @@ import { AppDispatch } from 'store';
 import { selectSettings } from 'store/settings/settings.slice';
 import Icon from '@ant-design/icons';
 import { useMemo } from 'react';
-import { logout } from 'store/auth/auth.slice';
+import { Logout } from 'store/auth/auth.action';
 // import Logo from 'assets/images/logo.ico';
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -108,7 +108,7 @@ const Sider = () => {
         'Logout',
         'logout',
         <Icon component={() => <SignOut size={16} />} />,
-        () => dispatch(logout())
+        () => dispatch(Logout())
       ),
     ];
   }, [navigate, dispatch]);

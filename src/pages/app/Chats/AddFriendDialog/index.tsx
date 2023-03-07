@@ -1,6 +1,5 @@
 import { Empty, Input, List, Modal } from 'antd';
 import { FC, useState } from 'react';
-import SimpleBarStyle from 'components/SimpleBarStyle';
 import { User } from 'types';
 import { SearchUsers } from 'requests';
 import ResultItem from './ResultItem';

@@ -2,23 +2,30 @@ import { AppThunk } from '..';
 import { SetSnackbar } from '../ui/ui.action';
 import {
   login,
+  logout,
   setLoginLoading,
   setRegisterEmail,
   setRegisterLoading,
 } from './auth.slice';
 import { PATH_AUTH } from 'routes/path';
 import * as Requests from 'requests';
+import {
+  clearFriendRequest,
+  setChatrooms,
+  setUser,
+} from 'store/data/data.slice';
 
 export const Login =
   (formValues: { email: string; password: string }): AppThunk =>
   async (dispatch, _getState) => {
     dispatch(setLoginLoading(true));
     try {
-      const { userId, token } = await Requests.Login(
+      const { user, token } = await Requests.Login(
         formValues.email,
         formValues.password
       );
-      dispatch(login({ userId, token }));
+      dispatch(login({ userId: user._id, token }));
+      dispatch(setUser(user));
     } catch (error) {
       dispatch(SetSnackbar(true, 'error', (error as Error).message));
     } finally {
@@ -51,12 +58,13 @@ export const VerifyOTP =
     dispatch(setRegisterLoading(true));
 
     try {
-      const { userId, token, message } = await Requests.VerifyOTP(
+      const { user, token, message } = await Requests.VerifyOTP(
         getState().auth.register.verifyingEmail,
         formValues.otp
       );
 
-      dispatch(login({ userId, token }));
+      dispatch(login({ userId: user._id, token }));
+      dispatch(setUser(user));
       dispatch(SetSnackbar(true, 'success', message));
       dispatch(setRegisterEmail(''));
     } catch (error) {
@@ -65,3 +73,10 @@ export const VerifyOTP =
       dispatch(setRegisterLoading(false));
     }
   };
+
+export const Logout = (): AppThunk => dispatch => {
+  dispatch(logout());
+  dispatch(setChatrooms([]));
+  dispatch(setUser(null));
+  dispatch(clearFriendRequest());
+};

@@ -1,4 +1,5 @@
 import {
+  GetChatroomReturnType,
   LoginReturnType,
   RegisterReturnType,
   SearchUsersReturnType,
@@ -11,6 +12,8 @@ const server = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000,
+  timeoutErrorMessage: 'Timeout!',
 });
 
 server.interceptors.response.use(
@@ -54,5 +57,15 @@ export const VerifyOTP = async (email: string, otp: string) => {
 
 export const SearchUsers = async (query: string) => {
   const { data } = await server.get<SearchUsersReturnType>(`/user/${query}`);
+  return data;
+};
+
+export const GetChatroom = async (friendId: string, token: string) => {
+  const { data } = await server.get<GetChatroomReturnType>(
+    `/chatroom/${friendId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return data;
 };

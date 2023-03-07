@@ -1,27 +1,75 @@
-import { Card, List, Modal } from 'antd';
-import { FC } from 'react';
+import { List, Modal, Tabs } from 'antd';
+import { useState } from 'react';
 import FriendsItem from './FriendsItem';
-import { ChatList as CHATLIST } from 'data';
 import SimpleBarStyle from 'components/SimpleBarStyle';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
+import RequestItem from './RequestItem';
+import { selectUI } from 'store/ui/ui.slice';
+import { useAppDispatch } from 'store';
+import { CloseFriendsDialog } from 'store/ui/ui.action';
 
-type FriendsDialogProps = {
-  open: boolean;
-  handleCancel: () => void;
+const tabItems = [
+  {
+    key: 'friends',
+    label: 'Friends',
+  },
+  {
+    key: 'requests',
+    label: 'Requests',
+  },
+];
+
+const FriendsList = () => {
+  const { user } = useSelector(selectData);
+
+  return (
+    <List
+      dataSource={user?.friends}
+      renderItem={item => <FriendsItem user={item} />}
+      split
+    />
+  );
 };
 
-const FriendsDialog: FC<FriendsDialogProps> = ({ open, handleCancel }) => {
+const RequestsList = () => {
+  const { friendRequests } = useSelector(selectData);
+
   return (
-    <Modal title='Friends' open={open} onCancel={handleCancel} footer={null}>
+    <List
+      dataSource={friendRequests}
+      renderItem={item => <RequestItem request={item} />}
+      split
+    />
+  );
+};
+
+const FriendsDialog = () => {
+  const [active, setActive] = useState('friends');
+  const {
+    friendsDialog: { open },
+  } = useSelector(selectUI);
+  const dispatch = useAppDispatch();
+
+  return (
+    <Modal
+      title='Friends'
+      open={open}
+      onCancel={() => dispatch(CloseFriendsDialog())}
+      footer={null}
+    >
+      <Tabs centered items={tabItems} onChange={setActive} />
       <SimpleBarStyle style={{ height: '60vh' }}>
-        <List
-          dataSource={CHATLIST}
-          renderItem={item => (
-            <Card bodyStyle={{ padding: 0 }}>
-              <FriendsItem user={item} />
-            </Card>
-          )}
-          split
-        />
+        {(() => {
+          switch (active) {
+            case 'friends':
+              return <FriendsList />;
+            case 'requests':
+              return <RequestsList />;
+            default:
+              return <FriendsList />;
+          }
+        })()}
       </SimpleBarStyle>
     </Modal>
   );

@@ -1,5 +1,5 @@
 import { AppThunk } from '..';
-import { setChatSider, setSnackbar } from './ui.slice';
+import { setChatSider, setFriendsDialog, setSnackbar } from './ui.slice';
 
 export const SetSnackbar =
   (
@@ -31,3 +31,11 @@ export const SetChatSider =
   (dispatch, _getState) => {
     dispatch(setChatSider({ open, type }));
   };
+
+export const CloseFriendsDialog = (): AppThunk => (dispatch, _getState) => {
+  dispatch(setFriendsDialog(false));
+};
+
+export const OpenFriendsDialog = (): AppThunk => (dispatch, _getState) => {
+  dispatch(setFriendsDialog(true));
+};

@@ -22,12 +22,15 @@ import {
   ImgMessage,
   FileMessage,
   LinkMessage,
-} from 'data';
+} from 'types';
+import { useSelector } from 'react-redux';
+import { selectAuth } from 'store/auth/auth.slice';
 
 type MessageProps<MsgType extends MessageType> = {
   message: MsgType;
   enableMenu?: boolean;
   fullWidth?: boolean;
+  isSender?: boolean;
 };
 
 const Text: FC<PropsWithChildren<{ isSender: boolean } & TextProps>> = ({
@@ -124,12 +127,13 @@ const MessageText: FC<MessageProps<TextMessage>> = ({
   message,
   enableMenu,
   fullWidth,
+  isSender = false,
 }) => {
   const { token } = theme.useToken();
 
   return (
     <MessageBody
-      isSender={message.isSender}
+      isSender={isSender}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
@@ -146,11 +150,11 @@ const MessageText: FC<MessageProps<TextMessage>> = ({
             }}
           >
             <Text ellipsis={true} isSender={false}>
-              {message.quote.message}
+              {message.quote.text}
             </Text>
           </Space>
         )}
-        <Text isSender={message.isSender}>{message.message}</Text>
+        <Text isSender={isSender}>{message.text}</Text>
       </Space>
     </MessageBody>
   );
@@ -160,10 +164,11 @@ const MessageImage: FC<MessageProps<ImgMessage>> = ({
   message,
   enableMenu,
   fullWidth,
+  isSender = false,
 }) => {
   return (
     <MessageBody
-      isSender={message.isSender}
+      isSender={isSender}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
@@ -174,7 +179,7 @@ const MessageImage: FC<MessageProps<ImgMessage>> = ({
           style={{ maxHeight: 210, cursor: 'pointer' }}
           src={message.img}
         />
-        <Text isSender={message.isSender}>{message.message}</Text>
+        <Text isSender={isSender}>{message.text}</Text>
       </Space>
     </MessageBody>
   );
@@ -184,12 +189,13 @@ const MessageFile: FC<MessageProps<FileMessage>> = ({
   message,
   enableMenu,
   fullWidth,
+  isSender = false,
 }) => {
   const { token } = theme.useToken();
 
   return (
     <MessageBody
-      isSender={message.isSender}
+      isSender={isSender}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
@@ -232,7 +238,7 @@ const MessageFile: FC<MessageProps<FileMessage>> = ({
             icon={<Icon component={() => <Download size={18} />} />}
           />
         </Row>
-        <Text isSender={message.isSender}>{message.message}</Text>
+        <Text isSender={isSender}>{message.text}</Text>
       </Space>
     </MessageBody>
   );
@@ -242,12 +248,13 @@ const MessageLink: FC<MessageProps<LinkMessage>> = ({
   message,
   enableMenu,
   fullWidth,
+  isSender = false,
 }) => {
   const { token } = theme.useToken();
 
   return (
     <MessageBody
-      isSender={message.isSender}
+      isSender={isSender}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
@@ -270,7 +277,7 @@ const MessageLink: FC<MessageProps<LinkMessage>> = ({
             {message.link}
           </Typography.Link>
         </Space>
-        <Text isSender={message.isSender}>{message.message}</Text>
+        <Text isSender={isSender}>{message.text}</Text>
       </Space>
     </MessageBody>
   );
@@ -281,17 +288,21 @@ const Message: FC<MessageProps<MessageType>> = ({
   enableMenu,
   fullWidth,
 }) => {
+  const { userId } = useSelector(selectAuth);
+  const isSender = userId === message.sender._id;
   return (
     <>
       {(() => {
         switch (message.type) {
           case 'divider':
             return <MessageDivider message={message} />;
+          default:
           case 'msg': {
             switch (message.subtype) {
               case 'text':
                 return (
                   <MessageText
+                    isSender={isSender}
                     message={message}
                     enableMenu={enableMenu}
                     fullWidth={fullWidth}
@@ -300,6 +311,7 @@ const Message: FC<MessageProps<MessageType>> = ({
               case 'img':
                 return (
                   <MessageImage
+                    isSender={isSender}
                     message={message}
                     enableMenu={enableMenu}
                     fullWidth={fullWidth}
@@ -308,6 +320,7 @@ const Message: FC<MessageProps<MessageType>> = ({
               case 'file':
                 return (
                   <MessageFile
+                    isSender={isSender}
                     message={message}
                     enableMenu={enableMenu}
                     fullWidth={fullWidth}
@@ -316,6 +329,7 @@ const Message: FC<MessageProps<MessageType>> = ({
               case 'link':
                 return (
                   <MessageLink
+                    isSender={isSender}
                     message={message}
                     enableMenu={enableMenu}
                     fullWidth={fullWidth}
@@ -324,6 +338,7 @@ const Message: FC<MessageProps<MessageType>> = ({
               default:
                 return (
                   <MessageText
+                    isSender={isSender}
                     message={message}
                     enableMenu={enableMenu}
                     fullWidth={fullWidth}
