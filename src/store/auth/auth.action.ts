@@ -12,6 +12,7 @@ import * as Requests from 'requests';
 import {
   clearFriendRequest,
   setChatrooms,
+  setCurrentChatroomId,
   setUser,
 } from 'store/data/data.slice';
 
@@ -79,4 +80,5 @@ export const Logout = (): AppThunk => dispatch => {
   dispatch(setChatrooms([]));
   dispatch(setUser(null));
   dispatch(clearFriendRequest());
+  dispatch(setCurrentChatroomId(''));
 };

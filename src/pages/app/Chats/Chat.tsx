@@ -5,17 +5,24 @@ import Avatar from 'components/Avatar';
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from 'store';
 import { SwitchChatSider } from 'store/ui/ui.action';
 import ChatSider from './ChatSider';
+import { selectData } from 'store/data/data.slice';
+import { selectAuth } from 'store/auth/auth.slice';
 
 const Chat = () => {
   const { token } = theme.useToken();
   const dispatch = useDispatch<AppDispatch>();
-
-  const ONLINE = Math.random() > 0.5;
-
+  const { userId } = useSelector(selectAuth);
+  const {
+    conversation: { currentChatroomId, chatrooms },
+    user,
+  } = useSelector(selectData);
+  const chatroom = chatrooms.find(room => room._id === currentChatroomId);
+  const friend = chatroom?.users.find(u => u._id !== userId)!;
+  const updatedFriend = user?.friends.find(f => f._id === friend?._id)!;
   return (
     <Layout style={{ height: '100%' }} hasSider>
       <Layout>
@@ -36,19 +43,19 @@ const Chat = () => {
               <Avatar
                 style={{ cursor: 'pointer' }}
                 onClick={() => dispatch(SwitchChatSider())}
-                src={faker.image.avatar()}
-                alt='user'
-                online={ONLINE}
+                src={updatedFriend.avatar}
+                alt={updatedFriend.name}
+                online={updatedFriend.online}
               />
               <Space.Compact direction='vertical' style={{ lineHeight: 1 }}>
                 <Typography.Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                  {faker.name.fullName()}
+                  {updatedFriend.name}
                 </Typography.Text>
                 <Typography.Text
                   type='secondary'
                   style={{ fontSize: 8, fontWeight: 'bold' }}
                 >
-                  {ONLINE ? 'Online' : 'Offline'}
+                  {updatedFriend.online ? 'Online' : 'Offline'}
                 </Typography.Text>
               </Space.Compact>
             </Row>

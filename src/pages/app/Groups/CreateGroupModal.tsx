@@ -1,5 +1,7 @@
 import { Button, Form, Input, Modal, Row, Select, Space } from 'antd';
 import { FC } from 'react';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
 
 type CreateGroupModalProps = {
   open: boolean;
@@ -27,6 +29,8 @@ const CreateGroupModal: FC<CreateGroupModalProps> = ({
     form.resetFields();
   };
 
+  const { user } = useSelector(selectData);
+
   return (
     <Modal
       title='Create New Group'
@@ -38,7 +42,7 @@ const CreateGroupModal: FC<CreateGroupModalProps> = ({
       <Form onFinish={onFinish} style={{ marginTop: 24 }} form={form}>
         <Form.Item
           label='Group Name'
-          name='groupName'
+          name='name'
           rules={[{ required: true, message: 'Please specify a name' }]}
         >
           <Input />
@@ -56,15 +60,11 @@ const CreateGroupModal: FC<CreateGroupModalProps> = ({
           ]}
         >
           <Select mode='multiple'>
-            <Select.Option value='red'>Red</Select.Option>
-            <Select.Option value='green'>Green</Select.Option>
-            <Select.Option value='blue'>Blue</Select.Option>
-            <Select.Option value='red2'>Red</Select.Option>
-            <Select.Option value='green3'>Green</Select.Option>
-            <Select.Option value='blue4'>Blue</Select.Option>
-            <Select.Option value='red5'>Red</Select.Option>
-            <Select.Option value='green6'>Green</Select.Option>
-            <Select.Option value='blue7'>Blue</Select.Option>
+            {user?.friends.map(friend => (
+              <Select.Option key={friend._id} value={friend._id}>
+                {friend.name}
+              </Select.Option>
+            ))}
           </Select>
         </Form.Item>
         <Row justify='end'>

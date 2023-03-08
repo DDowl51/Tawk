@@ -3,7 +3,13 @@ import { useSelector } from 'react-redux';
 import io, { Socket } from 'socket.io-client';
 import { useAppDispatch } from 'store';
 import { selectAuth } from 'store/auth/auth.slice';
-import { AddMessage, ReceivedFriendRequest } from 'store/data/data.action';
+import {
+  AddMessage,
+  AddUserFriend,
+  ReceivedFriendRequest,
+  SetFriendOffline,
+  SetFriendOnline,
+} from 'store/data/data.action';
 import { SetSnackbar } from 'store/ui/ui.action';
 import { ClientEvents, FriendRequest, MessageType } from 'types';
 
@@ -30,9 +36,18 @@ const SocketInit = () => {
         console.log(request);
         dispatch(ReceivedFriendRequest(request));
       });
+      socket.on(ClientEvents.HandleFriendRequest, (request: FriendRequest) => {
+        dispatch(AddUserFriend(request.recipient));
+      });
       socket.on(ClientEvents.NewMessage, (message: MessageType) => {
         console.log(message);
         dispatch(AddMessage(message));
+      });
+      socket.on(ClientEvents.FriendOnline, (fId: string) => {
+        dispatch(SetFriendOnline(fId));
+      });
+      socket.on(ClientEvents.FriendOffline, (fId: string) => {
+        dispatch(SetFriendOffline(fId));
       });
     }
 

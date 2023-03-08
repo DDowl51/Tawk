@@ -1,10 +1,16 @@
 import { Layout, theme } from 'antd';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
 
 import Chat from './Chat';
 import ChatList from './ChatList';
 
 const Chats = () => {
   const { token } = theme.useToken();
+  const {
+    conversation: { currentChatroomId },
+  } = useSelector(selectData);
+
   return (
     <Layout style={{ height: '100%' }}>
       <Layout.Sider
@@ -16,9 +22,7 @@ const Chats = () => {
       >
         <ChatList />
       </Layout.Sider>
-      <Layout.Content>
-        <Chat />
-      </Layout.Content>
+      <Layout.Content>{currentChatroomId && <Chat />}</Layout.Content>
     </Layout>
   );
 };

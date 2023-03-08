@@ -1,14 +1,35 @@
 import { AppThunk } from 'store';
-import { FriendRequest, MessageType } from 'types';
+import { FriendRequest, MessageType, User } from 'types';
 import {
   addChatroom,
   addFriendRequest,
   addMessage,
+  addUserFriend,
+  pinChatroom,
   setCurrentChatroomId,
   setFriendRequest,
+  setFriendState,
   setLastMesasge,
 } from './data.slice';
 import * as Request from 'requests';
+
+export const SetFriendOnline =
+  (friendId: string): AppThunk =>
+  (dispatch, getState) => {
+    dispatch(setFriendState({ friendId, online: true }));
+  };
+
+export const AddUserFriend =
+  (friend: User): AppThunk =>
+  (dispatch, getState) => {
+    dispatch(addUserFriend(friend));
+  };
+
+export const SetFriendOffline =
+  (friendId: string): AppThunk =>
+  (dispatch, getState) => {
+    dispatch(setFriendState({ friendId, online: false }));
+  };
 
 export const ReceivedFriendRequest =
   (request: FriendRequest): AppThunk =>
@@ -22,6 +43,17 @@ export const ReceivedFriendRequest =
       // Request already exists, update it
       dispatch(setFriendRequest({ request, index }));
     }
+  };
+
+export const AddChatroom =
+  (userId: string): AppThunk =>
+  async (dispatch, getState) => {
+    // chatroom doesn't exist, get a new one from server
+    const { chatroom } = await Request.GetChatroom(
+      userId,
+      getState().auth.token
+    );
+    dispatch(addChatroom({ ...chatroom, pinned: false }));
   };
 
 export const SetChatroom =
@@ -39,15 +71,27 @@ export const SetChatroom =
         userId,
         getState().auth.token
       );
-      dispatch(addChatroom(chatroom));
+      dispatch(addChatroom({ ...chatroom, pinned: false }));
       dispatch(setCurrentChatroomId(chatroom._id));
     } else {
       dispatch(setCurrentChatroomId(chatroomExists._id));
     }
   };
 
+export const PinChatroom =
+  (chatroomId: string): AppThunk =>
+  (dispatch, _getState) => {
+    dispatch(pinChatroom({ chatroomId, pin: true }));
+  };
+
+export const UnpinChatroom =
+  (chatroomId: string): AppThunk =>
+  (dispatch, _getState) => {
+    dispatch(pinChatroom({ chatroomId, pin: false }));
+  };
+
 export const AddMessage =
-  (message: MessageType): AppThunk =>
+  (message: any): AppThunk =>
   (dispatch, getState) => {
     const { chatroomId } = message;
     const chatroomExists = getState().data.conversation.chatrooms.find(
@@ -55,8 +99,9 @@ export const AddMessage =
     );
 
     if (!chatroomExists) {
-      dispatch(SetChatroom(message.sender._id));
+      dispatch(AddChatroom(message.sender._id));
     }
+
     dispatch(addMessage(message));
     dispatch(setLastMesasge(message));
   };

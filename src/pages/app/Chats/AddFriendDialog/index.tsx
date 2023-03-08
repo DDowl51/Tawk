@@ -19,13 +19,13 @@ const AddFriendDialog: FC<AddFriendsDialogProps> = ({ open, handleCancel }) => {
       const { users } = await SearchUsers(query);
       setResults(users);
       setLoading(false);
-      console.log(users);
     }
   };
 
   return (
     <Modal title='Friends' open={open} onCancel={handleCancel} footer={null}>
       <Input.Search
+        placeholder='Name or email'
         enterButton
         loading={loading}
         onSearch={handleSearch}

@@ -1,4 +1,4 @@
-import { Button, Card, Col, Row, theme, Typography } from 'antd';
+import { Button, Card, Col, Row, Space, theme, Typography } from 'antd';
 import { FC } from 'react';
 import Avatar from 'components/Avatar';
 import Icon from '@ant-design/icons/lib/components/Icon';
@@ -35,11 +35,17 @@ const FriendsItem: FC<FriendsItemProps> = ({ user }) => {
         <Col style={{ display: 'flex', alignItems: 'center', marginRight: 12 }}>
           <Avatar src={user.avatar} online={user.online} />
         </Col>
-        <Row style={{ flex: 1 }} align='middle'>
+        <Space.Compact style={{ flex: 1 }} direction='vertical'>
           <Typography.Text style={{ fontWeight: 'bold', lineHeight: 1.5 }}>
             {user.name}
           </Typography.Text>
-        </Row>
+          <Typography.Text
+            type='secondary'
+            style={{ fontWeight: '600', fontSize: 12, lineHeight: 1.5 }}
+          >
+            {user.email}
+          </Typography.Text>
+        </Space.Compact>
         <Button
           onClick={handleAddConversation}
           shape='circle'

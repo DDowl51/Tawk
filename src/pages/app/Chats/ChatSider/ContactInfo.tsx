@@ -25,8 +25,9 @@ import {
   X,
 } from 'phosphor-react';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from 'store';
+import { selectData } from 'store/data/data.slice';
 import { SetChatSider, SwitchChatSider } from 'store/ui/ui.action';
 import BlockDialog from './BlockDialog';
 import DeleteDialog from './DeleteDialog';
@@ -34,6 +35,16 @@ import DeleteDialog from './DeleteDialog';
 const ContactInfo = () => {
   const { token } = theme.useToken();
   const dispatch = useDispatch<AppDispatch>();
+
+  const {
+    conversation: { currentChatroomId, chatrooms },
+    user,
+  } = useSelector(selectData);
+
+  const currentTargetId = chatrooms
+    .find(room => room._id === currentChatroomId)!
+    .users.find(u => u._id !== user?._id)?._id;
+  const currentTarget = user?.friends.find(f => f._id === currentTargetId);
 
   const [muted, setMuted] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
@@ -82,7 +93,7 @@ const ContactInfo = () => {
             <Row wrap={false} align='middle' style={{ gap: 16 }}>
               <Avatar
                 size={64}
-                src={faker.image.avatar()}
+                src={currentTarget?.avatar}
                 alt='Contact avatar'
               />
               <Space direction='vertical' size={1}>
@@ -90,10 +101,10 @@ const ContactInfo = () => {
                   ellipsis={{ tooltip: faker.name.fullName() }}
                   style={{ fontSize: 16, fontWeight: 'bold', width: 180 }}
                 >
-                  nlzmlfjq809pfjalsdk;fjladfadsfasdfadfasd
+                  {currentTarget?.name}
                 </Typography.Text>
                 <Typography.Text style={{ fontWeight: '600' }}>
-                  {faker.phone.number('+86 13# #### ####')}
+                  {currentTarget?.email}
                 </Typography.Text>
               </Space>
             </Row>
@@ -244,7 +255,7 @@ const ContactInfo = () => {
                     ellipsis={{ tooltip: faker.name.fullName() }}
                     style={{ fontSize: 16, fontWeight: 'bold', width: 200 }}
                   >
-                    nlzmlfjq809pfjalsdk;fjladfadsfasdfadfasd
+                    Tawk
                   </Typography.Text>
                   <Typography.Text style={{ fontWeight: '600' }}>
                     Owl, Parrot, Rabbit, You

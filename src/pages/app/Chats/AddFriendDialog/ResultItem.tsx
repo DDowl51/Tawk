@@ -3,12 +3,13 @@ import Icon from '@ant-design/icons';
 import Avatar from 'components/Avatar';
 import { Plus } from 'phosphor-react';
 import { FC } from 'react';
-import { ServerEvents, User } from 'types';
+import { FriendRequest, ServerEvents, User } from 'types';
 import { useAppDispatch } from 'store';
 import { SetSnackbar } from 'store/ui/ui.action';
 import { useSelector } from 'react-redux';
 import { selectAuth } from 'store/auth/auth.slice';
 import { useSocket } from 'hooks/useSocket';
+import { AddUserFriend } from 'store/data/data.action';
 
 type ResultItemProps = {
   user: User;
@@ -27,8 +28,9 @@ const ResultItem: FC<ResultItemProps> = ({ user }) => {
         recipientId: user._id,
       },
       // Callback
-      (request: any) => {
+      (request: FriendRequest) => {
         dispatch(SetSnackbar(true, 'success', request._id));
+        dispatch(AddUserFriend(request.sender));
       }
     );
   };
@@ -41,7 +43,7 @@ const ResultItem: FC<ResultItemProps> = ({ user }) => {
       justify='space-between'
     >
       <Row style={{ gap: 8 }}>
-        <Avatar src={user.avatar} alt={user.name} />
+        <Avatar src={user.avatar} alt={user.name} online={user.online} />
         <Space.Compact direction='vertical'>
           <Typography.Text style={{ fontWeight: 'bold', fontSize: 16 }}>
             {user.name}

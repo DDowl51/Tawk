@@ -13,17 +13,41 @@ import { MagnifyingGlass, ArchiveBox, Users, Plus } from 'phosphor-react';
 import SimpleBarStyle from 'components/SimpleBarStyle';
 
 import ChatListItem from './ChatListItem';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import FriendsDialog from './FriendsDialog';
 import AddFriendDialog from './AddFriendDialog';
 import { useSelector } from 'react-redux';
 import { selectData } from 'store/data/data.slice';
 import { useAppDispatch } from 'store';
 import { OpenFriendsDialog } from 'store/ui/ui.action';
+import dayjs from 'dayjs';
 
 const ChatList = () => {
   const { conversation } = useSelector(selectData);
   const dispatch = useAppDispatch();
+  const sortedChatrooms = useMemo(() => {
+    const chatrooms = [...conversation.chatrooms].filter(
+      room => room.type === 'single'
+    );
+    return chatrooms.sort((a, b) => {
+      if (!a.lastMessage && !b.lastMessage) {
+        return 0;
+      } else {
+        if (!a.lastMessage) return 1;
+        if (!b.lastMessage) return -1;
+      }
+      return dayjs(b.lastMessage.createdAt).diff(a.lastMessage.createdAt);
+    });
+  }, [conversation.chatrooms]);
+
+  const pinnedChatrooms = useMemo(
+    () => sortedChatrooms.filter(room => room.pinned),
+    [sortedChatrooms]
+  );
+  const unpinnedChatrooms = useMemo(
+    () => sortedChatrooms.filter(room => !room.pinned),
+    [sortedChatrooms]
+  );
 
   const [addFriendsOpen, setAddFriendsOpen] = useState(false);
   const handleAddFriendsCancel = () => setAddFriendsOpen(false);
@@ -81,24 +105,26 @@ const ChatList = () => {
           style={{ height: '100%', overflow: 'auto', color: 'white' }}
         >
           <Space direction='vertical' style={{ width: '100%' }}>
-            <Typography.Title
-              type='secondary'
-              style={{
-                fontWeight: 'bold',
-                marginTop: 8,
-                userSelect: 'none',
-                fontSize: 12,
-              }}
-              level={5}
-            >
-              Pinned
-            </Typography.Title>
+            {pinnedChatrooms.length !== 0 && (
+              <Typography.Title
+                type='secondary'
+                style={{
+                  fontWeight: 'bold',
+                  marginTop: 8,
+                  userSelect: 'none',
+                  fontSize: 12,
+                }}
+                level={5}
+              >
+                Pinned
+              </Typography.Title>
+            )}
             {/* Pinned ChatListItem */}
-            {/* <Space direction='vertical' style={{ width: '100%' }} size={16}>
-              {conversation.chatrooms.filter(room => room.pinned).map(user => (
-                <ChatListItem key={user.id} user={user} />
+            <Space direction='vertical' style={{ width: '100%' }} size={16}>
+              {pinnedChatrooms.map(room => (
+                <ChatListItem key={room._id} chatroom={room} />
               ))}
-            </Space> */}
+            </Space>
             <Typography.Title
               type='secondary'
               style={{
@@ -114,7 +140,7 @@ const ChatList = () => {
             {/* All ChatListItem */}
             {
               <Space direction='vertical' style={{ width: '100%' }} size={16}>
-                {conversation.chatrooms.map(room => (
+                {unpinnedChatrooms.map(room => (
                   <ChatListItem key={room._id} chatroom={room} />
                 ))}
               </Space>

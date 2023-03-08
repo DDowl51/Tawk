@@ -73,12 +73,18 @@ const ChatInput = () => {
   const [input, setInput] = useState('');
 
   const handleSend = () => {
+    let type = 'text';
+    if (/^https?:\/\/(\w+).(.*)$/.test(input)) {
+      type = 'link';
+    }
+
     socket.emit(
       ServerEvents.SendMessage,
       {
         from: userId,
         text: input,
         chatroomId: currentChatroomId,
+        type,
       },
       (message: MessageType) => {
         dispatch(AddMessage(message));

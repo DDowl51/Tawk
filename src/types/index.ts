@@ -21,14 +21,26 @@ export interface FriendRequest extends BaseModel {
 }
 
 export interface Chatroom extends BaseModel {
-  name: string;
+  type: 'single' | 'group';
   messages: MessageType[];
   users: User[];
   lastMessage: MessageType;
+  pinned: boolean;
+}
+
+export interface SingleChatroom extends Chatroom {
+  type: 'single';
+}
+
+export interface GroupChatroom extends Chatroom {
+  type: 'group';
+  name: string;
+  owner: string;
+  admins: string[];
 }
 
 export interface BaseMessage {
-  type: 'msg' | 'divider';
+  type: 'text' | 'img' | 'file' | 'link';
   createdAt: string;
   updatedAt: string;
   chatroomId: string;
@@ -36,42 +48,31 @@ export interface BaseMessage {
   isSender: boolean;
 }
 
-export interface DividerMessage extends BaseMessage {
-  type: 'divider';
-  text: string;
-}
-
 export interface NormalMessage extends BaseMessage {
-  type: 'msg';
-  subtype: 'text' | 'img' | 'file' | 'link';
+  type: 'text' | 'img' | 'file' | 'link';
   isSender: boolean;
   text: string;
   quote?: NormalMessage;
 }
 
 export interface TextMessage extends NormalMessage {
-  subtype: 'text';
+  type: 'text';
 }
 export interface ImgMessage extends NormalMessage {
-  subtype: 'img';
+  type: 'img';
   img: string;
 }
 export interface FileMessage extends NormalMessage {
-  subtype: 'file';
+  type: 'file';
   fileinfo: { filename: string; filesize: number };
   file: string;
 }
 export interface LinkMessage extends NormalMessage {
-  subtype: 'link';
+  type: 'link';
   link: string;
   preview: string;
 }
-export type MessageType =
-  | TextMessage
-  | ImgMessage
-  | FileMessage
-  | LinkMessage
-  | DividerMessage;
+export type MessageType = TextMessage | ImgMessage | FileMessage | LinkMessage;
 
 // ------------------------- Socket.IO Events -------------------------
 // socket.emit(...)
@@ -91,6 +92,8 @@ export const ClientEvents = {
   ReceiveFriendRequest: 'receive_friend_request',
   HandleFriendRequest: 'handle_friend_request',
   NewMessage: 'new_message',
+  FriendOnline: 'friend_online',
+  FriendOffline: 'friend_offline',
 } as const;
 
 // ------------------------- Data from server -------------------------

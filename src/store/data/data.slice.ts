@@ -28,6 +28,21 @@ const slice = createSlice({
     setUser(state, action: PayloadAction<typeof initialState.user>) {
       state.user = action.payload;
     },
+    addUserFriend(state, action: PayloadAction<User>) {
+      if (!state.user) return;
+      state.user.friends.push(action.payload);
+    },
+    setFriendState(
+      state,
+      action: PayloadAction<{ friendId: string; online: boolean }>
+    ) {
+      if (!state.user) return;
+      const friend = state.user.friends.find(
+        f => f._id === action.payload.friendId
+      );
+      if (!friend) return;
+      friend.online = action.payload.online;
+    },
     // -- FriendRequest
     addFriendRequest(
       state,
@@ -53,6 +68,16 @@ const slice = createSlice({
     },
     setChatrooms(state, action: PayloadAction<Chatroom[]>) {
       state.conversation.chatrooms = action.payload;
+    },
+    pinChatroom(
+      state,
+      action: PayloadAction<{ chatroomId: string; pin: boolean }>
+    ) {
+      state.conversation.chatrooms = state.conversation.chatrooms.map(room => {
+        if (room._id === action.payload.chatroomId) {
+          return { ...room, pinned: action.payload.pin };
+        } else return room;
+      });
     },
     setLastMesasge(state, action: PayloadAction<MessageType>) {
       const chatroom = state.conversation.chatrooms.find(
@@ -80,8 +105,11 @@ export const {
   setFriendRequest,
   clearFriendRequest,
   setUser,
+  addUserFriend,
+  setFriendState,
   setCurrentChatroomId,
   setChatrooms,
+  pinChatroom,
   setLastMesasge,
   addChatroom,
   addMessage,

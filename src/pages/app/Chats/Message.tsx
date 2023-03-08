@@ -17,7 +17,6 @@ import { TextProps } from 'antd/es/typography/Text';
 import findTextColor from 'utils/findTextColor';
 import {
   MessageType,
-  DividerMessage,
   TextMessage,
   ImgMessage,
   FileMessage,
@@ -55,14 +54,14 @@ const Text: FC<PropsWithChildren<{ isSender: boolean } & TextProps>> = ({
   );
 };
 
-const MessageDivider: FC<{ message: DividerMessage }> = ({ message }) => {
+const MessageDivider: FC<{ time: string }> = ({ time }) => {
   return (
     <Divider plain>
       <Typography.Text
         type='secondary'
         style={{ fontSize: 8, fontWeight: 'bold' }}
       >
-        {message.text}
+        {time}
       </Typography.Text>
     </Divider>
   );
@@ -71,9 +70,10 @@ const MessageDivider: FC<{ message: DividerMessage }> = ({ message }) => {
 const getItem = (
   label: string,
   key: string,
-  icon?: React.ReactNode
+  icon?: React.ReactNode,
+  onClick?: () => void
 ): ItemType => {
-  return { label, key, icon };
+  return { label, key, icon, onClick };
 };
 
 const messageMenu: ItemType[] = [
@@ -283,69 +283,67 @@ const MessageLink: FC<MessageProps<LinkMessage>> = ({
   );
 };
 
-const Message: FC<MessageProps<MessageType>> = ({
+const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
   message,
   enableMenu,
   fullWidth,
+  isDivider = false,
 }) => {
   const { userId } = useSelector(selectAuth);
   const isSender = userId === message.sender._id;
   return (
     <>
       {(() => {
+        if (isDivider) {
+          return <MessageDivider time={message.text} />;
+        } else {
+        }
         switch (message.type) {
-          case 'divider':
-            return <MessageDivider message={message} />;
+          case 'text':
+            return (
+              <MessageText
+                isSender={isSender}
+                message={message}
+                enableMenu={enableMenu}
+                fullWidth={fullWidth}
+              />
+            );
+          case 'img':
+            return (
+              <MessageImage
+                isSender={isSender}
+                message={message}
+                enableMenu={enableMenu}
+                fullWidth={fullWidth}
+              />
+            );
+          case 'file':
+            return (
+              <MessageFile
+                isSender={isSender}
+                message={message}
+                enableMenu={enableMenu}
+                fullWidth={fullWidth}
+              />
+            );
+          case 'link':
+            return (
+              <MessageLink
+                isSender={isSender}
+                message={message}
+                enableMenu={enableMenu}
+                fullWidth={fullWidth}
+              />
+            );
           default:
-          case 'msg': {
-            switch (message.subtype) {
-              case 'text':
-                return (
-                  <MessageText
-                    isSender={isSender}
-                    message={message}
-                    enableMenu={enableMenu}
-                    fullWidth={fullWidth}
-                  />
-                );
-              case 'img':
-                return (
-                  <MessageImage
-                    isSender={isSender}
-                    message={message}
-                    enableMenu={enableMenu}
-                    fullWidth={fullWidth}
-                  />
-                );
-              case 'file':
-                return (
-                  <MessageFile
-                    isSender={isSender}
-                    message={message}
-                    enableMenu={enableMenu}
-                    fullWidth={fullWidth}
-                  />
-                );
-              case 'link':
-                return (
-                  <MessageLink
-                    isSender={isSender}
-                    message={message}
-                    enableMenu={enableMenu}
-                    fullWidth={fullWidth}
-                  />
-                );
-              default:
-                return (
-                  <MessageText
-                    isSender={isSender}
-                    message={message}
-                    enableMenu={enableMenu}
-                    fullWidth={fullWidth}
-                  />
-                );
-            }
-          }
+            return (
+              <MessageText
+                isSender={isSender}
+                message={message}
+                enableMenu={enableMenu}
+                fullWidth={fullWidth}
+              />
+            );
         }
       })()}
     </>

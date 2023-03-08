@@ -13,7 +13,6 @@ const MessageList: FC<{ enableMenu?: boolean }> = ({ enableMenu = true }) => {
   const currentChatroom = chatrooms.find(
     room => room._id === currentChatroomId
   );
-  console.log(chatrooms);
   return (
     <SimpleBarStyle>
       <Image.PreviewGroup>

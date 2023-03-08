@@ -1,4 +1,13 @@
-import { theme, Card, Row, Col, Typography, Button, Dropdown } from 'antd';
+import {
+  theme,
+  Card,
+  Row,
+  Col,
+  Typography,
+  Button,
+  Dropdown,
+  Space,
+} from 'antd';
 import { FC } from 'react';
 import { FriendRequest, ServerEvents } from 'types';
 import Avatar from 'components/Avatar';
@@ -61,11 +70,17 @@ const RequestItem: FC<RequestItemProps> = ({ request }) => {
             online={request.sender.online}
           />
         </Col>
-        <Row style={{ flex: 1 }} align='middle'>
+        <Space.Compact style={{ flex: 1 }} direction='vertical'>
           <Typography.Text style={{ fontWeight: 'bold', lineHeight: 1.5 }}>
             {request.sender.name}
           </Typography.Text>
-        </Row>
+          <Typography.Text
+            type='secondary'
+            style={{ fontWeight: '600', fontSize: 12, lineHeight: 1.5 }}
+          >
+            {request.sender.email}
+          </Typography.Text>
+        </Space.Compact>
         <Button.Group>
           <Dropdown.Button
             disabled={request.handled}
