@@ -39,7 +39,7 @@ const StarredMessages = () => {
       </Layout.Header>
 
       <Layout.Content>
-        <MessageList enableMenu={false} />
+        <MessageList messages={[]} enableMenu={false} />
       </Layout.Content>
     </Layout>
   );

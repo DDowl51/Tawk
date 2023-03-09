@@ -1,35 +1,33 @@
 import { FC } from 'react';
 import { Typography, Row, Col, theme, Button, Dropdown } from 'antd';
 import Avatar from 'components/Avatar';
-import { Chatroom } from 'types';
+import { GroupChatroom } from 'types';
 import { useSelector } from 'react-redux';
-import { selectAuth } from 'store/auth/auth.slice';
 import { useAppDispatch } from 'store';
 import { dateTo } from 'utils/dayjs';
-import { selectData, setCurrentSingleChatroomId } from 'store/data/data.slice';
+import { selectData } from 'store/data/data.slice';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { PinChatroom, UnpinChatroom } from 'store/data/data.action';
+import {
+  PinChatroom,
+  SetGroupChatroom,
+  UnpinChatroom,
+} from 'store/data/data.action';
 
-type ChatListItemProps = {
-  chatroom: Chatroom;
+type GroupListItemProps = {
+  chatroom: GroupChatroom;
 };
 
-const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
+const GroupListItem: FC<GroupListItemProps> = ({ chatroom }) => {
   const dispatch = useAppDispatch();
-  const { userId } = useSelector(selectAuth);
   const { token } = theme.useToken();
   const {
-    conversation: { currentSingleChatroomId },
-    user,
+    conversation: { currentGroupChatroomId },
   } = useSelector(selectData);
-  const { users } = chatroom;
-  const friend = users.find(u => u._id !== userId);
-  const updatedFriend = user?.friends.find(f => f._id === friend?._id);
 
-  const isCurrentChatroom = currentSingleChatroomId === chatroom._id;
+  const isCurrentChatroom = currentGroupChatroomId === chatroom._id;
 
   const handleSetCurrentTarget = () => {
-    dispatch(setCurrentSingleChatroomId(chatroom._id));
+    dispatch(SetGroupChatroom(chatroom));
   };
 
   const getItem = (
@@ -69,12 +67,15 @@ const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
         }}
       >
         <Col style={{ display: 'flex', alignItems: 'center', marginRight: 12 }}>
-          <Avatar src={updatedFriend!.avatar} online={updatedFriend!.online} />
+          <Avatar />
         </Col>
         <Col flex='1'>
-          <Row justify='space-between'>
-            <Typography.Text style={{ fontWeight: 'bold', lineHeight: 1.5 }}>
-              {updatedFriend!.name}
+          <Row justify='space-between' wrap={false}>
+            <Typography.Text
+              ellipsis={{ tooltip: chatroom.name }}
+              style={{ fontWeight: 'bold', lineHeight: 1.5 }}
+            >
+              {chatroom.name}
             </Typography.Text>
             <Typography.Text type='secondary' style={{ fontWeight: 'bold' }}>
               {chatroom.lastMessage?.createdAt &&
@@ -101,4 +102,4 @@ const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
   );
 };
 
-export default ChatListItem;
+export default GroupListItem;

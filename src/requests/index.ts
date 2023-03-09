@@ -62,7 +62,17 @@ export const SearchUsers = async (query: string) => {
 
 export const GetChatroom = async (friendId: string, token: string) => {
   const { data } = await server.get<GetChatroomReturnType>(
-    `/chatroom/${friendId}`,
+    `/chatroom/userId/${friendId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return data;
+};
+
+export const GetChatroomById = async (chatroomId: string, token: string) => {
+  const { data } = await server.get<GetChatroomReturnType>(
+    `/chatroom/${chatroomId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

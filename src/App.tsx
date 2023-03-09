@@ -1,5 +1,7 @@
 import { ConfigProvider } from 'antd';
 import useMessage from 'antd/es/message/useMessage';
+
+import zhCN from 'antd/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,7 +32,7 @@ const App = () => {
   }, [snackbar.open, snackbar.message, snackbar.type, messageApi, dispatch]);
 
   return (
-    <ConfigProvider theme={themeConfig(theme.colorPrimary)}>
+    <ConfigProvider theme={themeConfig(theme.colorPrimary)} locale={zhCN}>
       <Router />
       {contextHolder}
     </ConfigProvider>

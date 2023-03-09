@@ -6,7 +6,8 @@ export interface DataState {
   user: User | null;
   friendRequests: FriendRequest[];
   conversation: {
-    currentChatroomId: string | null;
+    currentSingleChatroomId: string | null;
+    currentGroupChatroomId: string | null;
     chatrooms: Chatroom[];
   };
 }
@@ -15,7 +16,8 @@ const initialState: DataState = {
   user: null,
   friendRequests: [],
   conversation: {
-    currentChatroomId: null,
+    currentSingleChatroomId: null,
+    currentGroupChatroomId: null,
     chatrooms: [],
   },
 };
@@ -63,8 +65,11 @@ const slice = createSlice({
     },
 
     // -- Conversation
-    setCurrentChatroomId(state, action: PayloadAction<string>) {
-      state.conversation.currentChatroomId = action.payload;
+    setCurrentSingleChatroomId(state, action: PayloadAction<string>) {
+      state.conversation.currentSingleChatroomId = action.payload;
+    },
+    setCurrentGroupChatroomId(state, action: PayloadAction<string>) {
+      state.conversation.currentGroupChatroomId = action.payload;
     },
     setChatrooms(state, action: PayloadAction<Chatroom[]>) {
       state.conversation.chatrooms = action.payload;
@@ -107,7 +112,8 @@ export const {
   setUser,
   addUserFriend,
   setFriendState,
-  setCurrentChatroomId,
+  setCurrentSingleChatroomId,
+  setCurrentGroupChatroomId,
   setChatrooms,
   pinChatroom,
   setLastMesasge,

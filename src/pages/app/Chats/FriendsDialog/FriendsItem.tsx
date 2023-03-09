@@ -5,7 +5,7 @@ import Icon from '@ant-design/icons/lib/components/Icon';
 import { Chat } from 'phosphor-react';
 import { User } from 'types';
 import { useAppDispatch } from 'store';
-import { SetChatroom } from 'store/data/data.action';
+import { SetSingleChatroom } from 'store/data/data.action';
 import { CloseFriendsDialog } from 'store/ui/ui.action';
 
 type FriendsItemProps = {
@@ -17,7 +17,7 @@ const FriendsItem: FC<FriendsItemProps> = ({ user }) => {
   const dispatch = useAppDispatch();
 
   const handleAddConversation = () => {
-    dispatch(SetChatroom(user._id));
+    dispatch(SetSingleChatroom(user._id));
     dispatch(CloseFriendsDialog());
   };
 

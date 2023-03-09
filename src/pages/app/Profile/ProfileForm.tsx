@@ -1,13 +1,15 @@
 import { faker } from '@faker-js/faker';
 import { Button, Form, Input, Row } from 'antd';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from 'store';
+import { selectData } from 'store/data/data.slice';
 import { SetSnackbar } from 'store/ui/ui.action';
 
 const ProfileForm = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector(selectData);
 
   const handleSubmit = (formValues: { name: string; about: string }) => {
     setLoading(true);
@@ -25,10 +27,16 @@ const ProfileForm = () => {
         name='name'
         extra='This name is visible to your contacts'
         rules={[{ required: true }]}
+        initialValue={user?.name}
       >
         <Input />
       </Form.Item>
-      <Form.Item label='About' name='about' rules={[{ required: true }]}>
+      <Form.Item
+        label='About'
+        name='about'
+        rules={[{ required: true }]}
+        initialValue={user?.about}
+      >
         <Input.TextArea
           autoSize={{ maxRows: 5, minRows: 3 }}
           value={faker.random.words(10)}

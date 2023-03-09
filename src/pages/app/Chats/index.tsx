@@ -8,7 +8,7 @@ import ChatList from './ChatList';
 const Chats = () => {
   const { token } = theme.useToken();
   const {
-    conversation: { currentChatroomId },
+    conversation: { currentSingleChatroomId },
   } = useSelector(selectData);
 
   return (
@@ -22,7 +22,7 @@ const Chats = () => {
       >
         <ChatList />
       </Layout.Sider>
-      <Layout.Content>{currentChatroomId && <Chat />}</Layout.Content>
+      <Layout.Content>{currentSingleChatroomId && <Chat />}</Layout.Content>
     </Layout>
   );
 };

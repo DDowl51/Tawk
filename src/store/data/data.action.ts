@@ -1,12 +1,19 @@
 import { AppThunk } from 'store';
-import { FriendRequest, MessageType, User } from 'types';
+import {
+  Chatroom,
+  FriendRequest,
+  GroupChatroom,
+  MessageType,
+  User,
+} from 'types';
 import {
   addChatroom,
   addFriendRequest,
   addMessage,
   addUserFriend,
   pinChatroom,
-  setCurrentChatroomId,
+  setCurrentGroupChatroomId,
+  setCurrentSingleChatroomId,
   setFriendRequest,
   setFriendState,
   setLastMesasge,
@@ -45,7 +52,7 @@ export const ReceivedFriendRequest =
     }
   };
 
-export const AddChatroom =
+export const AddChatroomFromUserId =
   (userId: string): AppThunk =>
   async (dispatch, getState) => {
     // chatroom doesn't exist, get a new one from server
@@ -56,7 +63,13 @@ export const AddChatroom =
     dispatch(addChatroom({ ...chatroom, pinned: false }));
   };
 
-export const SetChatroom =
+export const AddChatroom =
+  (chatroom: Chatroom): AppThunk =>
+  async (dispatch, _getState) => {
+    dispatch(addChatroom({ ...chatroom, pinned: false }));
+  };
+
+export const SetSingleChatroom =
   (userId: string): AppThunk =>
   async (dispatch, getState) => {
     const { chatrooms } = getState().data.conversation;
@@ -72,10 +85,16 @@ export const SetChatroom =
         getState().auth.token
       );
       dispatch(addChatroom({ ...chatroom, pinned: false }));
-      dispatch(setCurrentChatroomId(chatroom._id));
+      dispatch(setCurrentSingleChatroomId(chatroom._id));
     } else {
-      dispatch(setCurrentChatroomId(chatroomExists._id));
+      dispatch(setCurrentSingleChatroomId(chatroomExists._id));
     }
+  };
+
+export const SetGroupChatroom =
+  (chatroom: GroupChatroom): AppThunk =>
+  async (dispatch, _getState) => {
+    dispatch(setCurrentGroupChatroomId(chatroom._id));
   };
 
 export const PinChatroom =
@@ -91,15 +110,18 @@ export const UnpinChatroom =
   };
 
 export const AddMessage =
-  (message: any): AppThunk =>
-  (dispatch, getState) => {
+  (message: MessageType): AppThunk =>
+  async (dispatch, getState) => {
     const { chatroomId } = message;
+    const { token } = getState().auth;
     const chatroomExists = getState().data.conversation.chatrooms.find(
       room => room._id === chatroomId
     );
 
     if (!chatroomExists) {
-      dispatch(AddChatroom(message.sender._id));
+      // Get the chatroom from server
+      const { chatroom } = await Request.GetChatroomById(chatroomId, token);
+      dispatch(AddChatroom(chatroom));
     }
 
     dispatch(addMessage(message));

@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import {
   Row,
   Divider,
@@ -48,6 +48,7 @@ const Text: FC<PropsWithChildren<{ isSender: boolean } & TextProps>> = ({
         color: isSender ? textColor : token.colorText,
       }}
       ellipsis={props.ellipsis}
+      {...props}
     >
       {children}
     </Typography.Text>
@@ -85,40 +86,50 @@ const messageMenu: ItemType[] = [
 ];
 
 type MessageBodyProps = {
-  isSender: boolean;
+  message: MessageType;
   enableMenu?: boolean;
   fullWidth?: boolean;
 };
 
 const MessageBody: FC<PropsWithChildren<MessageBodyProps>> = ({
   children,
-  isSender,
+  message,
   enableMenu = true,
   fullWidth = false,
 }) => {
   const { token } = theme.useToken();
+  const { userId } = useSelector(selectAuth);
+  const isSender = message.sender._id === userId;
 
   return (
-    <Row justify={isSender ? 'end' : 'start'}>
-      <Dropdown
-        menu={{ items: messageMenu }}
-        trigger={enableMenu ? ['contextMenu'] : []}
-      >
-        <Row
-          style={{
-            padding: 8,
-            margin: 8,
-            borderRadius: 8,
-            backgroundColor: isSender
-              ? token.colorPrimary
-              : token.colorBgElevated,
-            width: fullWidth ? '100%' : undefined,
-            maxWidth: fullWidth ? '100%' : '70%',
-          }}
-        >
-          {children}
+    <Row style={{ margin: 8 }}>
+      <Space.Compact direction='vertical' style={{ width: '100%' }}>
+        {!isSender && (
+          <Row justify='start'>
+            <Typography.Text>{message.sender.name}</Typography.Text>
+          </Row>
+        )}
+        <Row justify={isSender ? 'end' : 'start'}>
+          <Dropdown
+            menu={{ items: messageMenu }}
+            trigger={enableMenu ? ['contextMenu'] : []}
+          >
+            <Row
+              style={{
+                padding: 8,
+                borderRadius: 8,
+                backgroundColor: isSender
+                  ? token.colorPrimary
+                  : token.colorBgElevated,
+                width: fullWidth ? '100%' : undefined,
+                maxWidth: fullWidth ? '100%' : '70%',
+              }}
+            >
+              {children}
+            </Row>
+          </Dropdown>
         </Row>
-      </Dropdown>
+      </Space.Compact>
     </Row>
   );
 };
@@ -133,7 +144,7 @@ const MessageText: FC<MessageProps<TextMessage>> = ({
 
   return (
     <MessageBody
-      isSender={isSender}
+      message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
@@ -168,7 +179,7 @@ const MessageImage: FC<MessageProps<ImgMessage>> = ({
 }) => {
   return (
     <MessageBody
-      isSender={isSender}
+      message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
@@ -195,7 +206,7 @@ const MessageFile: FC<MessageProps<FileMessage>> = ({
 
   return (
     <MessageBody
-      isSender={isSender}
+      message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
@@ -250,35 +261,28 @@ const MessageLink: FC<MessageProps<LinkMessage>> = ({
   fullWidth,
   isSender = false,
 }) => {
-  const { token } = theme.useToken();
-
+  console.log(message.preview);
+  const favicon = message.preview?.favicon;
+  const title = message.preview?.title;
   return (
     <MessageBody
-      isSender={isSender}
+      message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
     >
-      <Space direction='vertical'>
-        <Space
-          direction='vertical'
-          style={{
-            borderRadius: 8,
-            padding: 8,
-            border: `1px solid ${token.colorTextQuaternary}`,
-            width: 200,
-          }}
-        >
-          <Image
-            style={{ display: 'block' }}
-            preview={false}
-            src={message.preview}
-          />
-          <Typography.Link target='_blank' href={message.link} rel='noreferrer'>
-            {message.link}
-          </Typography.Link>
-        </Space>
-        <Text isSender={isSender}>{message.text}</Text>
-      </Space>
+      <Row align='bottom' style={{ gap: 8 }}>
+        <Image
+          style={{ display: 'block' }}
+          preview={false}
+          width={18}
+          src={favicon}
+        />
+        <Typography.Link target='_blank' href={message.link} rel='noreferrer'>
+          <Text isSender={isSender} style={{ textDecoration: 'underline' }}>
+            {title ?? message.link}
+          </Text>
+        </Typography.Link>
+      </Row>
     </MessageBody>
   );
 };
@@ -289,8 +293,6 @@ const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
   fullWidth,
   isDivider = false,
 }) => {
-  const { userId } = useSelector(selectAuth);
-  const isSender = userId === message.sender._id;
   return (
     <>
       {(() => {
@@ -302,7 +304,6 @@ const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
           case 'text':
             return (
               <MessageText
-                isSender={isSender}
                 message={message}
                 enableMenu={enableMenu}
                 fullWidth={fullWidth}
@@ -311,7 +312,6 @@ const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
           case 'img':
             return (
               <MessageImage
-                isSender={isSender}
                 message={message}
                 enableMenu={enableMenu}
                 fullWidth={fullWidth}
@@ -320,7 +320,6 @@ const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
           case 'file':
             return (
               <MessageFile
-                isSender={isSender}
                 message={message}
                 enableMenu={enableMenu}
                 fullWidth={fullWidth}
@@ -329,7 +328,6 @@ const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
           case 'link':
             return (
               <MessageLink
-                isSender={isSender}
                 message={message}
                 enableMenu={enableMenu}
                 fullWidth={fullWidth}
@@ -338,7 +336,6 @@ const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
           default:
             return (
               <MessageText
-                isSender={isSender}
                 message={message}
                 enableMenu={enableMenu}
                 fullWidth={fullWidth}

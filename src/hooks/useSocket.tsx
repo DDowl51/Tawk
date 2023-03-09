@@ -4,6 +4,7 @@ import io, { Socket } from 'socket.io-client';
 import { useAppDispatch } from 'store';
 import { selectAuth } from 'store/auth/auth.slice';
 import {
+  AddChatroom,
   AddMessage,
   AddUserFriend,
   ReceivedFriendRequest,
@@ -11,7 +12,7 @@ import {
   SetFriendOnline,
 } from 'store/data/data.action';
 import { SetSnackbar } from 'store/ui/ui.action';
-import { ClientEvents, FriendRequest, MessageType } from 'types';
+import { ClientEvents, FriendRequest, GroupChatroom, MessageType } from 'types';
 
 let socket: Socket;
 
@@ -33,14 +34,12 @@ const SocketInit = () => {
         dispatch(SetSnackbar(true, 'error', reason));
       });
       socket.on(ClientEvents.ReceiveFriendRequest, (request: FriendRequest) => {
-        console.log(request);
         dispatch(ReceivedFriendRequest(request));
       });
       socket.on(ClientEvents.HandleFriendRequest, (request: FriendRequest) => {
         dispatch(AddUserFriend(request.recipient));
       });
       socket.on(ClientEvents.NewMessage, (message: MessageType) => {
-        console.log(message);
         dispatch(AddMessage(message));
       });
       socket.on(ClientEvents.FriendOnline, (fId: string) => {
@@ -48,6 +47,9 @@ const SocketInit = () => {
       });
       socket.on(ClientEvents.FriendOffline, (fId: string) => {
         dispatch(SetFriendOffline(fId));
+      });
+      socket.on(ClientEvents.JoinGroup, (chatroom: GroupChatroom) => {
+        dispatch(AddChatroom(chatroom));
       });
     }
 

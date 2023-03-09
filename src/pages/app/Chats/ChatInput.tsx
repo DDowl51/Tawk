@@ -14,9 +14,8 @@ import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { useSelector } from 'react-redux';
 import { selectSettings } from 'store/settings/settings.slice';
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { useAppDispatch } from 'store';
-import { selectData } from 'store/data/data.slice';
 import { useSocket } from 'hooks/useSocket';
 import { MessageType, ServerEvents } from 'types';
 import { selectAuth } from 'store/auth/auth.slice';
@@ -62,10 +61,11 @@ const AttachOptions = () => {
   );
 };
 
-const ChatInput = () => {
-  const {
-    conversation: { currentChatroomId },
-  } = useSelector(selectData);
+type ChatInputType = {
+  chatroomId: string;
+};
+
+const ChatInput: FC<ChatInputType> = ({ chatroomId }) => {
   const { theme } = useSelector(selectSettings);
   const { userId } = useSelector(selectAuth);
   const dispatch = useAppDispatch();
@@ -83,7 +83,7 @@ const ChatInput = () => {
       {
         from: userId,
         text: input,
-        chatroomId: currentChatroomId,
+        chatroomId,
         type,
       },
       (message: MessageType) => {

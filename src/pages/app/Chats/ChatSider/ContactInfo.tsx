@@ -37,12 +37,12 @@ const ContactInfo = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const {
-    conversation: { currentChatroomId, chatrooms },
+    conversation: { currentSingleChatroomId, chatrooms },
     user,
   } = useSelector(selectData);
 
   const currentTargetId = chatrooms
-    .find(room => room._id === currentChatroomId)!
+    .find(room => room._id === currentSingleChatroomId)!
     .users.find(u => u._id !== user?._id)?._id;
   const currentTarget = user?.friends.find(f => f._id === currentTargetId);
 

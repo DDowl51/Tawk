@@ -14,6 +14,9 @@ export interface UIState {
   friendsDialog: {
     open: boolean;
   };
+  createGroupDialog: {
+    open: boolean;
+  };
 }
 
 const initialState: UIState = {
@@ -27,6 +30,9 @@ const initialState: UIState = {
     message: '',
   },
   friendsDialog: {
+    open: false,
+  },
+  createGroupDialog: {
     open: false,
   },
 };
@@ -44,9 +50,17 @@ const slice = createSlice({
     setFriendsDialog(state, action: PayloadAction<boolean>) {
       state.friendsDialog.open = action.payload;
     },
+    setCreateGroupDialog(state, action: PayloadAction<boolean>) {
+      state.createGroupDialog.open = action.payload;
+    },
   },
 });
 
 export const selectUI = (state: RootState) => state.ui;
-export const { setSnackbar, setChatSider, setFriendsDialog } = slice.actions;
+export const {
+  setSnackbar,
+  setChatSider,
+  setFriendsDialog,
+  setCreateGroupDialog,
+} = slice.actions;
 export default slice.reducer;

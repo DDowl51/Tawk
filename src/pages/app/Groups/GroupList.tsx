@@ -8,33 +8,43 @@ import {
   Space,
   Divider,
 } from 'antd';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Icon from '@ant-design/icons';
 import { MagnifyingGlass, Plus } from 'phosphor-react';
 import SimpleBarStyle from 'components/SimpleBarStyle';
 
 import CreateGroupModal from './CreateGroupModal';
+import { useAppDispatch } from 'store';
+import { OpenCreateGroupDialog } from 'store/ui/ui.action';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
+import dayjs from 'dayjs';
+import GroupListItem from './GroupListItem';
+import { GroupChatroom } from 'types';
 
 const GroupList = () => {
   const { token } = theme.useToken();
+  const dispatch = useAppDispatch();
 
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [createLoading, setCreateLoading] = useState(false);
-
-  const handleCreate = () => {
-    setCreateLoading(true);
-
-    return new Promise<void>(resolve => {
-      setTimeout(() => {
-        setCreateLoading(false);
-        setCreateDialogOpen(false);
-        resolve();
-      }, 1000);
+  const {
+    conversation: { chatrooms },
+  } = useSelector(selectData);
+  const groupChatrooms = useMemo<GroupChatroom[]>(() => {
+    const groupChatrooms = chatrooms.filter(
+      room => room.type === 'group'
+    ) as GroupChatroom[];
+    return groupChatrooms.sort((a, b) => {
+      if (!a.lastMessage && !b.lastMessage) {
+        return 0;
+      } else {
+        if (!a.lastMessage) return 1;
+        if (!b.lastMessage) return -1;
+      }
+      return dayjs(b.lastMessage.createdAt).diff(a.lastMessage.createdAt);
     });
-  };
-  const handleCancel = () => {
-    setCreateDialogOpen(false);
-  };
+  }, [chatrooms]);
+  const pinnedGroupChatrooms = groupChatrooms.filter(room => room.pinned);
+  const unpinnedGroupChatrooms = groupChatrooms.filter(room => !room.pinned);
 
   return (
     <>
@@ -62,7 +72,7 @@ const GroupList = () => {
             style={{
               width: '100%',
             }}
-            onClick={() => setCreateDialogOpen(true)}
+            onClick={() => dispatch(OpenCreateGroupDialog())}
           >
             <Row justify='space-between'>
               <Typography.Text
@@ -79,27 +89,39 @@ const GroupList = () => {
         </Space>
         <Divider style={{ margin: 0, marginTop: 8 }} />
         <SimpleBarStyle
-          style={{ height: '100%', overflow: 'auto', color: 'white' }}
+          style={{
+            height: '100%',
+            overflow: 'auto',
+            color: 'white',
+          }}
         >
-          <Space direction='vertical'>
-            <Typography.Title
-              type='secondary'
-              style={{
-                fontWeight: 'bold',
-                marginTop: 8,
-                userSelect: 'none',
-                fontSize: 12,
-              }}
-              level={5}
-            >
-              Pinned
-            </Typography.Title>
+          <Space
+            direction='vertical'
+            style={{
+              width: '100%',
+            }}
+          >
             {/* Pinned Groups */}
+            {pinnedGroupChatrooms.length !== 0 && (
+              <Typography.Title
+                type='secondary'
+                style={{
+                  fontWeight: 'bold',
+                  marginTop: 8,
+                  userSelect: 'none',
+                  fontSize: 12,
+                }}
+                level={5}
+              >
+                Pinned
+              </Typography.Title>
+            )}
             <Space direction='vertical' style={{ width: '100%' }} size={16}>
-              {/* {CHATLIST.filter(user => user.pinned).map(user => (
-                <ChatListItem key={user.id} user={user} />
-              ))} */}
+              {pinnedGroupChatrooms.map(room => (
+                <GroupListItem key={room._id} chatroom={room} />
+              ))}
             </Space>
+            {/* All Groups */}
             <Typography.Title
               type='secondary'
               style={{
@@ -112,25 +134,19 @@ const GroupList = () => {
             >
               All Group
             </Typography.Title>
-            {/* All Groups */}
             {
-              // <Space direction='vertical' style={{ width: '100%' }} size={16}>
-              //   {CHATLIST.filter(user => !user.pinned).map(user => (
-              //     <ChatListItem key={user.id} user={user} />
-              //   ))}
-              // </Space>
+              <Space direction='vertical' style={{ width: '100%' }} size={16}>
+                {unpinnedGroupChatrooms.map(room => (
+                  <GroupListItem key={room._id} chatroom={room} />
+                ))}
+              </Space>
             }
           </Space>
         </SimpleBarStyle>
       </Col>
 
       {/* Create New Group Popup */}
-      <CreateGroupModal
-        open={createDialogOpen}
-        confirmLoading={createLoading}
-        handleCreate={handleCreate}
-        handleCancel={handleCancel}
-      />
+      <CreateGroupModal />
     </>
   );
 };

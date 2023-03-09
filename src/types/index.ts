@@ -9,6 +9,7 @@ export interface User extends BaseModel {
   email: string;
   avatar?: string;
   online: boolean;
+  about: string;
   friends: Omit<User, 'friends'>[];
 }
 
@@ -20,7 +21,7 @@ export interface FriendRequest extends BaseModel {
   requestTimes: number;
 }
 
-export interface Chatroom extends BaseModel {
+interface BaseChatroom extends BaseModel {
   type: 'single' | 'group';
   messages: MessageType[];
   users: User[];
@@ -28,16 +29,18 @@ export interface Chatroom extends BaseModel {
   pinned: boolean;
 }
 
-export interface SingleChatroom extends Chatroom {
+export interface SingleChatroom extends BaseChatroom {
   type: 'single';
 }
 
-export interface GroupChatroom extends Chatroom {
+export interface GroupChatroom extends BaseChatroom {
   type: 'group';
   name: string;
   owner: string;
   admins: string[];
 }
+
+export type Chatroom = SingleChatroom | GroupChatroom;
 
 export interface BaseMessage {
   type: 'text' | 'img' | 'file' | 'link';
@@ -70,7 +73,15 @@ export interface FileMessage extends NormalMessage {
 export interface LinkMessage extends NormalMessage {
   type: 'link';
   link: string;
-  preview: string;
+  preview?: {
+    description?: string;
+    favicon?: string;
+    image?: string;
+    site_name?: string;
+    title?: string;
+    type?: string;
+    url?: string;
+  };
 }
 export type MessageType = TextMessage | ImgMessage | FileMessage | LinkMessage;
 
@@ -82,6 +93,7 @@ export const ServerEvents = {
   CreateFriendRequest: 'create_friend_request',
   HandleFriendRequest: 'handle_friend_request',
   SendMessage: 'send_message',
+  CreateGroup: 'create_group',
 } as const;
 
 // socket.on(...)
@@ -94,6 +106,7 @@ export const ClientEvents = {
   NewMessage: 'new_message',
   FriendOnline: 'friend_online',
   FriendOffline: 'friend_offline',
+  JoinGroup: 'join_group',
 } as const;
 
 // ------------------------- Data from server -------------------------

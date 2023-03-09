@@ -12,7 +12,7 @@ import * as Requests from 'requests';
 import {
   clearFriendRequest,
   setChatrooms,
-  setCurrentChatroomId,
+  setCurrentSingleChatroomId,
   setUser,
 } from 'store/data/data.slice';
 
@@ -27,6 +27,7 @@ export const Login =
       );
       dispatch(login({ userId: user._id, token }));
       dispatch(setUser(user));
+      // Get GroupChatrooms Info
     } catch (error) {
       dispatch(SetSnackbar(true, 'error', (error as Error).message));
     } finally {
@@ -80,5 +81,5 @@ export const Logout = (): AppThunk => dispatch => {
   dispatch(setChatrooms([]));
   dispatch(setUser(null));
   dispatch(clearFriendRequest());
-  dispatch(setCurrentChatroomId(''));
+  dispatch(setCurrentSingleChatroomId(''));
 };

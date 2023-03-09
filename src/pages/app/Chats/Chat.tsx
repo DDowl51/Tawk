@@ -17,10 +17,12 @@ const Chat = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { userId } = useSelector(selectAuth);
   const {
-    conversation: { currentChatroomId, chatrooms },
+    conversation: { currentSingleChatroomId, chatrooms },
     user,
   } = useSelector(selectData);
-  const chatroom = chatrooms.find(room => room._id === currentChatroomId);
+  const chatroom = chatrooms.find(
+    room => room._id === currentSingleChatroomId
+  )!;
   const friend = chatroom?.users.find(u => u._id !== userId)!;
   const updatedFriend = user?.friends.find(f => f._id === friend?._id)!;
   return (
@@ -81,7 +83,7 @@ const Chat = () => {
           </Row>
         </Layout.Header>
         <Layout.Content>
-          <MessageList />
+          <MessageList messages={chatroom?.messages || []} />
         </Layout.Content>
         <Layout.Footer
           style={{
@@ -90,7 +92,7 @@ const Chat = () => {
             boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
           }}
         >
-          <ChatInput />
+          <ChatInput chatroomId={chatroom._id} />
         </Layout.Footer>
       </Layout>
 
