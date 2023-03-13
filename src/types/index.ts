@@ -109,6 +109,15 @@ export const ClientEvents = {
   JoinGroup: 'join_group',
 } as const;
 
+// webrtc events, both on(...) and emit(...)
+export const WebRTCEvents = {
+  Offer: 'webrtc:offer',
+  Answer: 'webrtc:answer',
+  Candidate: 'webrtc:candidate',
+  Reject: 'webrtc:reject',
+  Error: 'webrtc:error',
+} as const;
+
 // ------------------------- Data from server -------------------------
 export interface BaseReturnType {
   status: string;

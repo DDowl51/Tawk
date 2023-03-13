@@ -3,7 +3,7 @@ import { useSocket } from 'hooks/useSocket';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from 'store';
-import { AddChatroom, AddChatroomFromUserId } from 'store/data/data.action';
+import { AddChatroom } from 'store/data/data.action';
 import { selectData } from 'store/data/data.slice';
 import { CloseCreateGroupDialog } from 'store/ui/ui.action';
 import { selectUI } from 'store/ui/ui.slice';

@@ -29,6 +29,7 @@
     "react-router-dom": "^6.8.2",
     "react-scripts": "5.0.1",
     "redux-persist": "^6.0.0",
+    "simple-peer": "^9.11.1",
     "simplebar-react": "^3.2.1",
     "socket.io-client": "^4.6.1",
     "styled-components": "^5.3.8",
@@ -60,6 +61,7 @@
     ]
   },
   "devDependencies": {
+    "@types/simple-peer": "^9.11.5",
     "@types/styled-components": "^5.1.26"
   }
 }

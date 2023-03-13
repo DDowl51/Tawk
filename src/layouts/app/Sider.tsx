@@ -39,7 +39,7 @@ const getItem = (
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
-  onClick?: () => void,
+  onClick?: (dispatch: any) => void,
   children?: MenuItem[]
 ): MenuItem => {
   return {
@@ -51,44 +51,55 @@ const getItem = (
   };
 };
 
-const siderMenus: MenuItem[] = [
-  getItem(
-    'Chat',
-    PATH_DASHBOARD.app.chats,
-    <NavLink to={PATH_DASHBOARD.app.chats}>
-      <ChatCircleDots size={16} />
-    </NavLink>
-  ),
-  getItem(
-    'Group',
-    PATH_DASHBOARD.app.groups,
-    <NavLink to={PATH_DASHBOARD.app.groups}>
-      <Icon component={() => <Users size={18} />} />
-    </NavLink>
-  ),
-  getItem(
-    'Call',
-    PATH_DASHBOARD.app.calls,
-    <NavLink to={PATH_DASHBOARD.app.calls}>
-      <Icon component={() => <Phone size={18} />} />
-    </NavLink>
-  ),
-  { type: 'divider' },
-  getItem(
-    'Setting',
-    PATH_DASHBOARD.app.settings,
-    <NavLink to={PATH_DASHBOARD.app.settings}>
-      <Icon component={() => <GearSix size={18} />} />
-    </NavLink>
-  ),
-];
-
 const Sider = () => {
   const location = useLocation();
   const { token } = theme.useToken();
   const dispatch = useDispatch<AppDispatch>();
   const settings = useSelector(selectSettings);
   const navigate = useNavigate();
+
+  const siderMenus = useMemo<MenuItem[]>(
+    () => [
+      getItem(
+        'Chat',
+        PATH_DASHBOARD.app.chats,
+        <NavLink to={PATH_DASHBOARD.app.chats}>
+          <ChatCircleDots size={16} />
+        </NavLink>
+      ),
+      getItem(
+        'Group',
+        PATH_DASHBOARD.app.groups,
+        <NavLink to={PATH_DASHBOARD.app.groups}>
+          <Icon component={() => <Users size={18} />} />
+        </NavLink>
+      ),
+      getItem(
+        'Call',
+        PATH_DASHBOARD.app.calls,
+        <NavLink to={PATH_DASHBOARD.app.calls}>
+          <Icon component={() => <Phone size={18} />} />
+        </NavLink>
+      ),
+      { type: 'divider' },
+      getItem(
+        'Setting',
+        PATH_DASHBOARD.app.settings,
+        <NavLink to={PATH_DASHBOARD.app.settings}>
+          <Icon component={() => <GearSix size={18} />} />
+        </NavLink>
+      ),
+      getItem(
+        'Logout',
+        'sider-logout',
+        <NavLink to={PATH_DASHBOARD.app.settings}>
+          <Icon component={() => <GearSix size={18} />} />
+        </NavLink>,
+        () => dispatch(Logout())
+      ),
+    ],
+    [dispatch]
+  );
 
   const profileMenu = useMemo(() => {
     return [

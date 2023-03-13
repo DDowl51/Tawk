@@ -3,6 +3,7 @@ import {
   setChatSider,
   setCreateGroupDialog,
   setFriendsDialog,
+  setMessageSider,
   setSnackbar,
 } from './ui.slice';
 
@@ -51,4 +52,12 @@ export const OpenCreateGroupDialog = (): AppThunk => (dispatch, _getState) => {
 
 export const CloseCreateGroupDialog = (): AppThunk => (dispatch, _getState) => {
   dispatch(setCreateGroupDialog(false));
+};
+
+export const OpenVideoSider = (): AppThunk => (dispatch, _getState) => {
+  dispatch(setMessageSider({ open: true, type: 'video', width: '50%' }));
+};
+
+export const CloseMessageSider = (): AppThunk => (dispatch, _getState) => {
+  dispatch(setMessageSider({ open: false }));
 };

@@ -8,7 +8,7 @@ import {
   Space,
   Divider,
 } from 'antd';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Icon from '@ant-design/icons';
 import { MagnifyingGlass, Plus } from 'phosphor-react';
 import SimpleBarStyle from 'components/SimpleBarStyle';

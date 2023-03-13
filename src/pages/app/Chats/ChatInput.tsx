@@ -20,6 +20,7 @@ import { useSocket } from 'hooks/useSocket';
 import { MessageType, ServerEvents } from 'types';
 import { selectAuth } from 'store/auth/auth.slice';
 import { AddMessage } from 'store/data/data.action';
+import { SetSnackbar } from 'store/ui/ui.action';
 
 const Actions = [
   {
@@ -73,6 +74,9 @@ const ChatInput: FC<ChatInputType> = ({ chatroomId }) => {
   const [input, setInput] = useState('');
 
   const handleSend = () => {
+    if (input.trim().length === 0) {
+      return dispatch(SetSnackbar(true, 'warning', '请输入消息'));
+    }
     let type = 'text';
     if (/^https?:\/\/(\w+).(.*)$/.test(input)) {
       type = 'link';

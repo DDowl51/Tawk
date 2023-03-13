@@ -22,7 +22,7 @@ const SocketInit = () => {
 
   useEffect(() => {
     if (token) {
-      socket = io('http://localhost:5000', { auth: { token } });
+      socket = io('wss://192.168.0.102:5002', { auth: { token } });
       console.log('connected');
       socket.on('disconnect', reason => {
         console.log(`disconnected, reason: ${reason}`);

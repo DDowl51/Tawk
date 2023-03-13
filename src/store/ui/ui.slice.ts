@@ -17,6 +17,11 @@ export interface UIState {
   createGroupDialog: {
     open: boolean;
   };
+  messageSider: {
+    open: boolean;
+    type: 'video';
+    width: string;
+  };
 }
 
 const initialState: UIState = {
@@ -34,6 +39,12 @@ const initialState: UIState = {
   },
   createGroupDialog: {
     open: false,
+  },
+  messageSider: {
+    // MessageList中的sider, 视频通话用
+    open: false,
+    type: 'video',
+    width: '50%',
   },
 };
 
@@ -53,6 +64,15 @@ const slice = createSlice({
     setCreateGroupDialog(state, action: PayloadAction<boolean>) {
       state.createGroupDialog.open = action.payload;
     },
+    setMessageSider(
+      state,
+      action: PayloadAction<Partial<typeof initialState.messageSider>>
+    ) {
+      state.messageSider.open = action.payload.open ?? state.messageSider.open;
+      state.messageSider.type = action.payload.type ?? state.messageSider.type;
+      state.messageSider.width =
+        action.payload.width ?? state.messageSider.width;
+    },
   },
 });
 
@@ -62,5 +82,6 @@ export const {
   setChatSider,
   setFriendsDialog,
   setCreateGroupDialog,
+  setMessageSider,
 } = slice.actions;
 export default slice.reducer;
