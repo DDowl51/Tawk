@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Menu,
-  Col,
-  Row,
-  Image,
-  theme,
-  Avatar,
-  Switch,
-  Space,
-  Dropdown,
-} from 'antd';
+import { Menu, Col, Row, Image, theme, Switch, Space, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   ChatCircleDots,
@@ -23,7 +13,6 @@ import { NavLink } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router';
 
 import { PATH_DASHBOARD } from 'routes/path';
-import { faker } from '@faker-js/faker';
 import { useDispatch, useSelector } from 'react-redux';
 import { SwitchMode } from 'store/settings/settings.action';
 import { AppDispatch } from 'store';
@@ -31,6 +20,8 @@ import { selectSettings } from 'store/settings/settings.slice';
 import Icon from '@ant-design/icons';
 import { useMemo } from 'react';
 import { Logout } from 'store/auth/auth.action';
+import { selectData } from 'store/data/data.slice';
+import Avatar from 'components/Avatar';
 // import Logo from 'assets/images/logo.ico';
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -57,6 +48,7 @@ const Sider = () => {
   const dispatch = useDispatch<AppDispatch>();
   const settings = useSelector(selectSettings);
   const navigate = useNavigate();
+  const { user } = useSelector(selectData);
 
   const siderMenus = useMemo<MenuItem[]>(
     () => [
@@ -169,7 +161,7 @@ const Sider = () => {
               onClick={() => navigate(PATH_DASHBOARD.app.profile)}
               style={{ cursor: 'pointer' }}
               size='large'
-              src={faker.image.avatar()}
+              src={user?.avatar}
             />
           </Dropdown>
         </Row>

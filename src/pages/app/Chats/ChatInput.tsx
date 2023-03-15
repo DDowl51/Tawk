@@ -1,5 +1,5 @@
 import { Row, Button, Input, Popover, Space, Tooltip } from 'antd';
-import Icon from '@ant-design/icons';
+import Icon, { WindowsFilled } from '@ant-design/icons';
 import {
   Plus,
   Smiley,
@@ -12,15 +12,15 @@ import {
 } from 'phosphor-react';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
+import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { selectSettings } from 'store/settings/settings.slice';
-import { FC, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import { useAppDispatch } from 'store';
 import { useSocket } from 'hooks/useSocket';
 import { MessageType, ServerEvents } from 'types';
 import { selectAuth } from 'store/auth/auth.slice';
 import { AddMessage } from 'store/data/data.action';
-import { SetSnackbar } from 'store/ui/ui.action';
 
 const Actions = [
   {
@@ -72,10 +72,14 @@ const ChatInput: FC<ChatInputType> = ({ chatroomId }) => {
   const dispatch = useAppDispatch();
   const socket = useSocket();
   const [input, setInput] = useState('');
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputEl = document.getElementById(
+    'chatinput-textarea'
+  )! as HTMLTextAreaElement;
 
   const handleSend = () => {
     if (input.trim().length === 0) {
-      return dispatch(SetSnackbar(true, 'warning', '请输入消息'));
+      toast.error('请输入消息');
     }
     let type = 'text';
     if (/^https?:\/\/(\w+).(.*)$/.test(input)) {
@@ -92,9 +96,21 @@ const ChatInput: FC<ChatInputType> = ({ chatroomId }) => {
       },
       (message: MessageType) => {
         dispatch(AddMessage(message));
+        console.log(message.text);
       }
     );
     setInput('');
+  };
+
+  const handleEmojiSelect = (emojiData: any) => {
+    const start = inputEl.selectionStart;
+    inputEl.setRangeText(emojiData.native);
+    inputEl.setSelectionRange(
+      start + emojiData.native.length,
+      start + emojiData.native.length
+    );
+    inputEl.focus();
+    setInput(inputEl.value);
   };
 
   return (
@@ -110,15 +126,32 @@ const ChatInput: FC<ChatInputType> = ({ chatroomId }) => {
           <Button size='large' icon={<Icon component={() => <Plus />} />} />
         </Popover>
         <Input.TextArea
+          id='chatinput-textarea'
+          ref={inputRef}
           value={input}
           onChange={e => setInput(e.target.value)}
           size='large'
           autoSize={{ minRows: 1, maxRows: 3 }}
+          onPressEnter={e => {
+            e.preventDefault();
+            // ctrl+enter 换行 而不是 发送消息
+            if (e.ctrlKey) {
+              setInput(prev => `${prev}\n`);
+            } else {
+              handleSend();
+            }
+          }}
         />
         <Popover
           mouseLeaveDelay={0.2}
           placement='topRight'
-          content={<Picker data={data} theme={theme.mode} />}
+          content={
+            <Picker
+              data={data}
+              theme={theme.mode}
+              onEmojiSelect={handleEmojiSelect}
+            />
+          }
           autoAdjustOverflow
         >
           <Button size='large' icon={<Icon component={() => <Smiley />} />} />

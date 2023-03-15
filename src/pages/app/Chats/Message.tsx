@@ -24,12 +24,14 @@ import {
 } from 'types';
 import { useSelector } from 'react-redux';
 import { selectAuth } from 'store/auth/auth.slice';
+import { useNavigate } from 'react-router';
 
 type MessageProps<MsgType extends MessageType> = {
   message: MsgType;
   enableMenu?: boolean;
   fullWidth?: boolean;
   isSender?: boolean;
+  style?: React.CSSProperties;
 };
 
 const Text: FC<PropsWithChildren<{ isSender: boolean } & TextProps>> = ({
@@ -46,6 +48,7 @@ const Text: FC<PropsWithChildren<{ isSender: boolean } & TextProps>> = ({
       style={{
         fontWeight: 'bold',
         color: isSender ? textColor : token.colorText,
+        whiteSpace: 'pre-line', // 识别\n换行
       }}
       ellipsis={props.ellipsis}
       {...props}
@@ -89,9 +92,11 @@ type MessageBodyProps = {
   message: MessageType;
   enableMenu?: boolean;
   fullWidth?: boolean;
+  style?: React.CSSProperties;
 };
 
 const MessageBody: FC<PropsWithChildren<MessageBodyProps>> = ({
+  style,
   children,
   message,
   enableMenu = true,
@@ -100,9 +105,8 @@ const MessageBody: FC<PropsWithChildren<MessageBodyProps>> = ({
   const { token } = theme.useToken();
   const { userId } = useSelector(selectAuth);
   const isSender = message.sender._id === userId;
-
   return (
-    <Row style={{ margin: 8 }}>
+    <Row style={{ margin: 8, ...style, willChange: 'auto' }}>
       <Space.Compact direction='vertical' style={{ width: '100%' }}>
         {!isSender && (
           <Row justify='start'>
@@ -135,24 +139,29 @@ const MessageBody: FC<PropsWithChildren<MessageBodyProps>> = ({
 };
 
 const MessageText: FC<MessageProps<TextMessage>> = ({
+  style,
   message,
   enableMenu,
   fullWidth,
   isSender = false,
 }) => {
   const { token } = theme.useToken();
+  const navigate = useNavigate();
 
   return (
     <MessageBody
       message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
+      style={style}
     >
       <Space direction='vertical'>
         {message.quote && (
           <Space
+            onClick={() => navigate(`#${message._id}`)}
             direction='vertical'
             style={{
+              cursor: 'pointer',
               backgroundColor: token.colorPrimaryBgHover,
               borderRadius: 8,
               padding: 8,
@@ -172,6 +181,7 @@ const MessageText: FC<MessageProps<TextMessage>> = ({
 };
 
 const MessageImage: FC<MessageProps<ImgMessage>> = ({
+  style,
   message,
   enableMenu,
   fullWidth,
@@ -179,6 +189,7 @@ const MessageImage: FC<MessageProps<ImgMessage>> = ({
 }) => {
   return (
     <MessageBody
+      style={style}
       message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
@@ -197,6 +208,7 @@ const MessageImage: FC<MessageProps<ImgMessage>> = ({
 };
 
 const MessageFile: FC<MessageProps<FileMessage>> = ({
+  style,
   message,
   enableMenu,
   fullWidth,
@@ -206,6 +218,7 @@ const MessageFile: FC<MessageProps<FileMessage>> = ({
 
   return (
     <MessageBody
+      style={style}
       message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
@@ -256,6 +269,7 @@ const MessageFile: FC<MessageProps<FileMessage>> = ({
 };
 
 const MessageLink: FC<MessageProps<LinkMessage>> = ({
+  style,
   message,
   enableMenu,
   fullWidth,
@@ -266,6 +280,7 @@ const MessageLink: FC<MessageProps<LinkMessage>> = ({
   const title = message.preview?.title;
   return (
     <MessageBody
+      style={style}
       message={message}
       enableMenu={enableMenu}
       fullWidth={fullWidth}
@@ -287,64 +302,62 @@ const MessageLink: FC<MessageProps<LinkMessage>> = ({
   );
 };
 
-const Message: FC<MessageProps<MessageType> & { isDivider?: boolean }> = ({
-  message,
-  enableMenu,
-  fullWidth,
-  isDivider = false,
-}) => {
-  return (
-    <>
-      {(() => {
-        if (isDivider) {
-          return <MessageDivider time={message.text} />;
-        } else {
-        }
-        switch (message.type) {
-          case 'text':
-            return (
-              <MessageText
-                message={message}
-                enableMenu={enableMenu}
-                fullWidth={fullWidth}
-              />
-            );
-          case 'img':
-            return (
-              <MessageImage
-                message={message}
-                enableMenu={enableMenu}
-                fullWidth={fullWidth}
-              />
-            );
-          case 'file':
-            return (
-              <MessageFile
-                message={message}
-                enableMenu={enableMenu}
-                fullWidth={fullWidth}
-              />
-            );
-          case 'link':
-            return (
-              <MessageLink
-                message={message}
-                enableMenu={enableMenu}
-                fullWidth={fullWidth}
-              />
-            );
-          default:
-            return (
-              <MessageText
-                message={message}
-                enableMenu={enableMenu}
-                fullWidth={fullWidth}
-              />
-            );
-        }
-      })()}
-    </>
-  );
+const Message: FC<
+  MessageProps<MessageType> & {
+    isDivider?: boolean;
+  }
+> = ({ style, message, enableMenu, fullWidth, isDivider = false }) => {
+  if (isDivider) {
+    return <MessageDivider time={message.text} />;
+  } else {
+  }
+  switch (message.type) {
+    case 'text':
+      return (
+        <MessageText
+          style={style}
+          message={message}
+          enableMenu={enableMenu}
+          fullWidth={fullWidth}
+        />
+      );
+    case 'img':
+      return (
+        <MessageImage
+          style={style}
+          message={message}
+          enableMenu={enableMenu}
+          fullWidth={fullWidth}
+        />
+      );
+    case 'file':
+      return (
+        <MessageFile
+          style={style}
+          message={message}
+          enableMenu={enableMenu}
+          fullWidth={fullWidth}
+        />
+      );
+    case 'link':
+      return (
+        <MessageLink
+          style={style}
+          message={message}
+          enableMenu={enableMenu}
+          fullWidth={fullWidth}
+        />
+      );
+    default:
+      return (
+        <MessageText
+          style={style}
+          message={message}
+          enableMenu={enableMenu}
+          fullWidth={fullWidth}
+        />
+      );
+  }
 };
 
 export default Message;

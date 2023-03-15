@@ -5,7 +5,7 @@ import { Plus } from 'phosphor-react';
 import { FC } from 'react';
 import { FriendRequest, ServerEvents, User } from 'types';
 import { useAppDispatch } from 'store';
-import { SetSnackbar } from 'store/ui/ui.action';
+import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { selectAuth } from 'store/auth/auth.slice';
 import { useSocket } from 'hooks/useSocket';
@@ -29,7 +29,7 @@ const ResultItem: FC<ResultItemProps> = ({ user }) => {
       },
       // Callback
       (request: FriendRequest) => {
-        dispatch(SetSnackbar(true, 'success', request._id));
+        toast.success(request._id);
         dispatch(AddUserFriend(request.sender));
       }
     );

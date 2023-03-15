@@ -1,8 +1,6 @@
 import { Modal, Typography } from 'antd';
 import { FC, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from 'store';
-import { SetSnackbar } from 'store/ui/ui.action';
+import toast from 'react-hot-toast';
 
 type BlockDialogProps = {
   open: boolean;
@@ -11,7 +9,6 @@ type BlockDialogProps = {
 
 const BlockDialog: FC<BlockDialogProps> = ({ open, handleCancel }) => {
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
 
   const handleBlock = () => {
     setLoading(true);
@@ -19,7 +16,7 @@ const BlockDialog: FC<BlockDialogProps> = ({ open, handleCancel }) => {
     setTimeout(() => {
       setLoading(false);
       handleCancel();
-      dispatch(SetSnackbar(true, 'success', 'BLOCKED!!'));
+      toast.success('BLOCKED!!');
     }, 1500);
   };
 

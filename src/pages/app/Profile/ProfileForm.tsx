@@ -1,14 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { Button, Form, Input, Row } from 'antd';
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from 'store';
+import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import { selectData } from 'store/data/data.slice';
-import { SetSnackbar } from 'store/ui/ui.action';
 
 const ProfileForm = () => {
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector(selectData);
 
   const handleSubmit = (formValues: { name: string; about: string }) => {
@@ -16,7 +14,7 @@ const ProfileForm = () => {
     setTimeout(() => {
       console.log(formValues);
       setLoading(false);
-      dispatch(SetSnackbar(true, 'success', 'Profile updated'));
+      toast.success('Profile updated');
     }, 2000);
   };
 

@@ -1,5 +1,5 @@
+import toast from 'react-hot-toast';
 import { AppThunk } from '..';
-import { SetSnackbar } from '../ui/ui.action';
 import {
   login,
   logout,
@@ -29,7 +29,7 @@ export const Login =
       dispatch(setUser(user));
       // Get GroupChatrooms Info
     } catch (error) {
-      dispatch(SetSnackbar(true, 'error', (error as Error).message));
+      toast.error((error as Error).message);
     } finally {
       dispatch(setLoginLoading(false));
     }
@@ -48,7 +48,7 @@ export const Register =
       );
       window.location.href = PATH_AUTH.auth.verify;
     } catch (error) {
-      dispatch(SetSnackbar(true, 'error', (error as Error).message));
+      toast.error((error as Error).message);
     } finally {
       dispatch(setRegisterLoading(false));
     }
@@ -67,10 +67,10 @@ export const VerifyOTP =
 
       dispatch(login({ userId: user._id, token }));
       dispatch(setUser(user));
-      dispatch(SetSnackbar(true, 'success', message));
+      toast.success(message || 'success');
       dispatch(setRegisterEmail(''));
     } catch (error) {
-      dispatch(SetSnackbar(true, 'error', (error as Error).message));
+      toast.error((error as Error).message);
     } finally {
       dispatch(setRegisterLoading(false));
     }

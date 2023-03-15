@@ -43,6 +43,7 @@ export interface GroupChatroom extends BaseChatroom {
 export type Chatroom = SingleChatroom | GroupChatroom;
 
 export interface BaseMessage {
+  _id: string;
   type: 'text' | 'img' | 'file' | 'link';
   createdAt: string;
   updatedAt: string;
@@ -116,6 +117,8 @@ export const WebRTCEvents = {
   Candidate: 'webrtc:candidate',
   Reject: 'webrtc:reject',
   Error: 'webrtc:error',
+  Microphone: 'webrtc:microphone',
+  Speaker: 'webrtc:speaker',
 } as const;
 
 // ------------------------- Data from server -------------------------

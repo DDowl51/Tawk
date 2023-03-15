@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import io, { Socket } from 'socket.io-client';
 import { useAppDispatch } from 'store';
 import { selectAuth } from 'store/auth/auth.slice';
@@ -11,7 +12,6 @@ import {
   SetFriendOffline,
   SetFriendOnline,
 } from 'store/data/data.action';
-import { SetSnackbar } from 'store/ui/ui.action';
 import { ClientEvents, FriendRequest, GroupChatroom, MessageType } from 'types';
 
 let socket: Socket;
@@ -28,10 +28,10 @@ const SocketInit = () => {
         console.log(`disconnected, reason: ${reason}`);
       });
       socket.on('connect_error', err => {
-        dispatch(SetSnackbar(true, 'error', err.message));
+        toast.error(err.message);
       });
       socket.on(ClientEvents.Error, reason => {
-        dispatch(SetSnackbar(true, 'error', reason));
+        toast.error(reason);
       });
       socket.on(ClientEvents.ReceiveFriendRequest, (request: FriendRequest) => {
         dispatch(ReceivedFriendRequest(request));

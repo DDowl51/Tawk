@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from 'store';
 import {
   CloseMessageSider,
+  OpenAudioSider,
   OpenVideoSider,
   SwitchChatSider,
 } from 'store/ui/ui.action';
@@ -16,7 +17,8 @@ import { selectData } from 'store/data/data.slice';
 import { selectAuth } from 'store/auth/auth.slice';
 import VideoChat from './VideoChat';
 import { selectUI } from 'store/ui/ui.slice';
-import VideoContextProvider from './VideoChat/context/VideoContext';
+import MediaContextProvider from './context/MediaContext';
+import AudioChat from './AudioChat';
 
 const Chat = () => {
   const { token } = theme.useToken();
@@ -32,6 +34,7 @@ const Chat = () => {
   )!;
   const friend = chatroom?.users.find(u => u._id !== userId)!;
   const updatedFriend = user?.friends.find(f => f._id === friend?._id)!;
+
   return (
     <Layout style={{ height: '100%' }} hasSider>
       <Layout>
@@ -78,7 +81,7 @@ const Chat = () => {
                 shape='circle'
                 icon={<Icon component={() => <VideoCamera />} />}
                 onClick={() => {
-                  if (messageSider.open) {
+                  if (messageSider.open && messageSider.type === 'video') {
                     dispatch(CloseMessageSider());
                   } else {
                     dispatch(OpenVideoSider());
@@ -86,7 +89,19 @@ const Chat = () => {
                 }}
               />
               <Button
+                type={
+                  messageSider.open && messageSider.type === 'audio'
+                    ? 'primary'
+                    : 'default'
+                }
                 shape='circle'
+                onClick={() => {
+                  if (messageSider.open && messageSider.type === 'audio') {
+                    dispatch(CloseMessageSider());
+                  } else {
+                    dispatch(OpenAudioSider());
+                  }
+                }}
                 icon={<Icon component={() => <Phone />} />}
               />
               <Button
@@ -110,7 +125,7 @@ const Chat = () => {
             {/* Video & Audio Chat */}
             <Layout.Sider
               style={{
-                backgroundColor: token.colorBgTextActive,
+                backgroundColor: token.colorBgElevated,
                 boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
               }}
               trigger={null}
@@ -119,11 +134,24 @@ const Chat = () => {
               collapsed={!messageSider.open}
               collapsible
               collapsedWidth={0}
-              width={messageSider.width || '30%'}
+              width={messageSider.width}
             >
-              <VideoContextProvider to={updatedFriend}>
-                <VideoChat user={updatedFriend} />
-              </VideoContextProvider>
+              {(() => {
+                switch (messageSider.type) {
+                  case 'video':
+                    return (
+                      <MediaContextProvider to={updatedFriend} type='video'>
+                        <VideoChat user={updatedFriend} />
+                      </MediaContextProvider>
+                    );
+                  case 'audio':
+                    return (
+                      <MediaContextProvider to={updatedFriend} type='audio'>
+                        <AudioChat user={updatedFriend} />
+                      </MediaContextProvider>
+                    );
+                }
+              })()}
             </Layout.Sider>
           </Layout>
         </Layout.Content>

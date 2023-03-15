@@ -6,11 +6,6 @@ export interface UIState {
     open: boolean;
     type: 'contact' | 'starred' | 'shared';
   };
-  snackbar: {
-    open: boolean;
-    type: 'success' | 'error' | 'warning' | 'info' | 'loading';
-    message: string;
-  };
   friendsDialog: {
     open: boolean;
   };
@@ -19,7 +14,7 @@ export interface UIState {
   };
   messageSider: {
     open: boolean;
-    type: 'video';
+    type: 'video' | 'audio';
     width: string;
   };
 }
@@ -28,11 +23,6 @@ const initialState: UIState = {
   chatSider: {
     open: false,
     type: 'contact',
-  },
-  snackbar: {
-    open: false,
-    type: 'success',
-    message: '',
   },
   friendsDialog: {
     open: false,
@@ -55,9 +45,6 @@ const slice = createSlice({
     setChatSider(state, action: PayloadAction<typeof initialState.chatSider>) {
       state.chatSider = action.payload;
     },
-    setSnackbar(state, action: PayloadAction<typeof initialState.snackbar>) {
-      state.snackbar = action.payload;
-    },
     setFriendsDialog(state, action: PayloadAction<boolean>) {
       state.friendsDialog.open = action.payload;
     },
@@ -78,7 +65,6 @@ const slice = createSlice({
 
 export const selectUI = (state: RootState) => state.ui;
 export const {
-  setSnackbar,
   setChatSider,
   setFriendsDialog,
   setCreateGroupDialog,
