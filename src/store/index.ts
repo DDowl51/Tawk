@@ -19,11 +19,13 @@ import settingsReducer from './settings/settings.slice';
 import authReducer from './auth/auth.slice';
 import uiReducer from './ui/ui.slice';
 import dataReducer from './data/data.slice';
+import mediaReducer from './media/media.slice';
 import { useDispatch } from 'react-redux';
 
 const persistConfig = {
   key: 'root',
   storage,
+  blacklist: ['media'],
 };
 
 const rootReducer = combineReducers({
@@ -31,6 +33,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   ui: uiReducer,
   data: dataReducer,
+  media: mediaReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

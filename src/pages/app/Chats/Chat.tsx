@@ -17,7 +17,6 @@ import { selectData } from 'store/data/data.slice';
 import { selectAuth } from 'store/auth/auth.slice';
 import VideoChat from './VideoChat';
 import { selectUI } from 'store/ui/ui.slice';
-import MediaContextProvider from './context/MediaContext';
 import AudioChat from './AudioChat';
 
 const Chat = () => {
@@ -36,7 +35,7 @@ const Chat = () => {
   const updatedFriend = user?.friends.find(f => f._id === friend?._id)!;
 
   return (
-    <Layout style={{ height: '100%' }} hasSider>
+    <Layout style={{ height: '100vh' }} hasSider>
       <Layout>
         <Layout.Header
           style={{
@@ -131,27 +130,27 @@ const Chat = () => {
               trigger={null}
               defaultCollapsed
               reverseArrow
-              collapsed={!messageSider.open}
+              collapsed={!messageSider.open || messageSider.type !== 'video'}
               collapsible
               collapsedWidth={0}
               width={messageSider.width}
             >
-              {(() => {
-                switch (messageSider.type) {
-                  case 'video':
-                    return (
-                      <MediaContextProvider to={updatedFriend} type='video'>
-                        <VideoChat user={updatedFriend} />
-                      </MediaContextProvider>
-                    );
-                  case 'audio':
-                    return (
-                      <MediaContextProvider to={updatedFriend} type='audio'>
-                        <AudioChat user={updatedFriend} />
-                      </MediaContextProvider>
-                    );
-                }
-              })()}
+              <VideoChat user={updatedFriend} />;
+            </Layout.Sider>
+            <Layout.Sider
+              style={{
+                backgroundColor: token.colorBgElevated,
+                boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
+              }}
+              trigger={null}
+              defaultCollapsed
+              reverseArrow
+              collapsed={!messageSider.open || messageSider.type !== 'audio'}
+              collapsible
+              collapsedWidth={0}
+              width={messageSider.width}
+            >
+              <AudioChat user={updatedFriend} />;
             </Layout.Sider>
           </Layout>
         </Layout.Content>

@@ -2,16 +2,41 @@ import { Button, Row, theme, Typography } from 'antd';
 import { FC } from 'react';
 import Icon from '@ant-design/icons';
 
-import { MemberType } from 'data';
 import Avatar from 'components/Avatar';
 import { Phone, VideoCamera } from 'phosphor-react';
+import { User } from 'types';
+import { useAppDispatch } from 'store';
+import { useNavigate } from 'react-router';
+import { PATH_DASHBOARD } from 'routes/path';
+import { SetSingleChatroom } from 'store/data/data.action';
+import { OpenAudioSider, OpenVideoSider } from 'store/ui/ui.action';
 
 type NewCallItemProps = {
-  item: MemberType;
+  item: Omit<User, 'friends'>;
 };
 
 const NewCallItem: FC<NewCallItemProps> = ({ item }) => {
   const { token } = theme.useToken();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleCall = (type: 'audio' | 'video') => {
+    // 导航去聊天界面
+    navigate(PATH_DASHBOARD.app.chats);
+
+    // 设置当前聊天对象为所选用户
+    dispatch(SetSingleChatroom(item._id));
+
+    // 打开电话/视频界面
+    switch (type) {
+      case 'audio':
+        dispatch(OpenAudioSider());
+        break;
+      case 'video':
+        dispatch(OpenVideoSider());
+        break;
+    }
+  };
 
   return (
     <Row
@@ -26,7 +51,7 @@ const NewCallItem: FC<NewCallItemProps> = ({ item }) => {
       align='middle'
     >
       <Row justify='space-between' align='middle' style={{ gap: 8 }}>
-        <Avatar online={item.online} src={item.img} alt={item.name} />
+        <Avatar online={item.online} src={item.avatar} alt={item.name} />
         <Typography.Text style={{ fontWeight: 'bold', lineHeight: 1 }}>
           {item.name}
         </Typography.Text>
@@ -34,12 +59,14 @@ const NewCallItem: FC<NewCallItemProps> = ({ item }) => {
 
       <Row>
         <Button
+          onClick={() => handleCall('audio')}
           size='large'
           shape='circle'
           type='text'
           icon={<Icon component={() => <Phone color={token.colorSuccess} />} />}
         />
         <Button
+          onClick={() => handleCall('video')}
           size='large'
           shape='circle'
           type='text'

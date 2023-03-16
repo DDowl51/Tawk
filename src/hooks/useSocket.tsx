@@ -12,13 +12,38 @@ import {
   SetFriendOffline,
   SetFriendOnline,
 } from 'store/data/data.action';
-import { ClientEvents, FriendRequest, GroupChatroom, MessageType } from 'types';
+import {
+  ClientEvents,
+  FriendRequest,
+  GroupChatroom,
+  MessageType,
+  User,
+  WebRTCEvents,
+} from 'types';
+import {
+  selectMedia,
+  setAnswerData,
+  setLoading,
+  setStatus,
+  setTargetUser,
+  setTimer,
+  setType,
+} from 'store/media/media.slice';
+import {
+  AddCandidate,
+  CloseConnection,
+  EndCall,
+  HandleAnswer,
+  SetRemote,
+} from 'store/media/media.action';
 
-let socket: Socket;
+export let socket: Socket;
 
 const SocketInit = () => {
   const { token } = useSelector(selectAuth);
   const dispatch = useAppDispatch();
+
+  const { status } = useSelector(selectMedia);
 
   useEffect(() => {
     if (token) {
@@ -59,6 +84,76 @@ const SocketInit = () => {
       }
     };
   }, [token, dispatch]);
+
+  useEffect(() => {
+    // ---------- WebRTC events
+    if (socket) {
+      socket.on(
+        WebRTCEvents.Offer,
+        (data: {
+          remoteSDP: RTCSessionDescriptionInit;
+          from: User;
+          type: 'audio' | 'video';
+        }) => {
+          if (status !== 'idle') {
+            socket.emit(WebRTCEvents.EndCall, {
+              type: data.type,
+              to: data.from._id,
+              reason: 'busy',
+            });
+            return;
+          }
+          dispatch(setType(data.type));
+          dispatch(setAnswerData(data));
+          dispatch(setLoading(false));
+          dispatch(setStatus('answering'));
+          dispatch(setTargetUser(data.from));
+          // auto reject on 60s
+          const rejectTimer = setTimeout(() => {
+            dispatch(EndCall('Time out'));
+            dispatch(setTimer(null));
+          }, 60000);
+          dispatch(setTimer(rejectTimer));
+        }
+      );
+
+      socket.on(
+        WebRTCEvents.Answer,
+        (data: {
+          remoteSDP: RTCSessionDescriptionInit;
+          from: User;
+          type: 'audio' | 'video';
+        }) => {
+          dispatch(HandleAnswer(data));
+        }
+      );
+
+      socket.on(WebRTCEvents.Candidate, (candidate: RTCIceCandidate) => {
+        dispatch(AddCandidate(candidate));
+      });
+
+      socket.on(WebRTCEvents.EndCall, (reason: string) => {
+        dispatch(CloseConnection(reason));
+      });
+
+      socket.on(WebRTCEvents.Error, (reason: string) => {
+        dispatch(CloseConnection(reason));
+      });
+
+      socket.on(WebRTCEvents.Microphone, (muted: boolean) => {
+        dispatch(SetRemote('microphone', muted));
+      });
+      socket.on(WebRTCEvents.Speaker, (muted: boolean) => {
+        dispatch(SetRemote('speaker', muted));
+      });
+    }
+
+    return () => {
+      Object.values(WebRTCEvents).forEach(evName => {
+        socket.off(evName);
+      });
+    };
+  }, [dispatch, status]);
 
   return <></>;
 };

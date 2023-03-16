@@ -5,6 +5,8 @@ import { MagnifyingGlass } from 'phosphor-react';
 import { MembersList } from 'data';
 import NewCallItem from './NewCallItem';
 import SimpleBarStyle from 'components/SimpleBarStyle';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
 
 type NewCallModalType = {
   open: boolean;
@@ -12,6 +14,8 @@ type NewCallModalType = {
 };
 
 const NewCallModal: FC<NewCallModalType> = ({ open, handleCancel }) => {
+  const { user } = useSelector(selectData);
+
   return (
     <Modal open={open} onCancel={handleCancel} footer={null} title='Start Call'>
       <Input
@@ -22,8 +26,8 @@ const NewCallModal: FC<NewCallModalType> = ({ open, handleCancel }) => {
       />
       <SimpleBarStyle style={{ height: 500 }}>
         <Space direction='vertical' size={8} style={{ width: '100%' }}>
-          {MembersList.map(item => (
-            <NewCallItem key={item.id} item={item} />
+          {user?.friends.map(f => (
+            <NewCallItem key={f._id} item={f} />
           ))}
         </Space>
       </SimpleBarStyle>

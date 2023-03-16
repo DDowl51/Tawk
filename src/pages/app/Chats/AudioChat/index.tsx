@@ -9,21 +9,20 @@ import {
   SpeakerHigh,
   SpeakerSlash,
 } from 'phosphor-react';
-import {
-  CSSProperties,
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { CSSProperties, FC, useCallback, useEffect, useRef } from 'react';
 import toast, { Toast } from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 import { useAppDispatch } from 'store';
+import {
+  CreateAnswer,
+  CreateOffer,
+  EndCall,
+  SetLocal,
+} from 'store/media/media.action';
+import { selectMedia } from 'store/media/media.slice';
 import { CloseMessageSider, OpenAudioSider } from 'store/ui/ui.action';
 import { User } from 'types';
-import { MediaContext } from '../context/MediaContext';
 
 const prefixZero = (num: number) => num.toString().padStart(2, '0');
 
@@ -74,39 +73,42 @@ type AudioChatProps = {
 
 const AudioChat: FC<AudioChatProps> = ({ user }) => {
   const { token } = theme.useToken();
-  const mediaCtx = useContext(MediaContext);
   const dispatch = useAppDispatch();
+  const {
+    targetUser,
+    status,
+    answerData,
+    loading,
+    localDevices,
+    remoteDevices,
+    type,
+  } = useSelector(selectMedia);
 
   const toastIdRef = useRef<string>('');
   const duration = useStopwatch({ autoStart: false });
 
-  const [microphoneMuted, setMicrophoneMuted] = useState(false);
-  const [speakerMuted, setSpeakerMuted] = useState(false);
-
-  const { name } = mediaCtx.targetUser ? mediaCtx.targetUser : user;
+  const { name } = targetUser || user;
 
   const handleMicrophone = () => {
-    mediaCtx.setMicrophone(microphoneMuted);
-    setMicrophoneMuted(prev => !prev);
+    dispatch(SetLocal('microphone', !localDevices.microphone));
   };
   const handleSpeaker = () => {
-    mediaCtx.setSpeaker(speakerMuted);
-    setSpeakerMuted(prev => !prev);
+    dispatch(SetLocal('speaker', !localDevices.speaker));
   };
 
   // 拒绝或者挂断
   const handleReject = useCallback(() => {
-    if (mediaCtx.status === 'answering') {
+    if (status === 'answering') {
       // 拒绝通话邀请
-      mediaCtx.rejectOffer('Reject');
+      dispatch(EndCall('Reject'));
     }
-    if (mediaCtx.status === 'offering') {
+    if (status === 'offering') {
       // 取消通话邀请
-      mediaCtx.rejectOffer('Cancel');
+      dispatch(EndCall('Cancel'));
     }
-    if (mediaCtx.status === 'calling') {
+    if (status === 'calling') {
       // 挂断通话
-      mediaCtx.rejectOffer('Hang up');
+      dispatch(EndCall('Hang up'));
       dispatch(CloseMessageSider());
     }
     // 关闭Notification
@@ -114,7 +116,7 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
     // 重置计时器
     duration.reset();
     duration.pause();
-  }, [mediaCtx, duration, dispatch]);
+  }, [duration, dispatch, status]);
 
   const updateToastCalling = useCallback(() => {
     toastIdRef.current = updateToast(
@@ -153,41 +155,38 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
   }, [token.colorBgContainer, token.colorText, handleReject, duration, name]);
 
   const handleAccept = useCallback(() => {
-    if (mediaCtx.status === 'answering') {
+    if (status === 'answering') {
       //  同意通话邀请
-      mediaCtx.answerOffer();
-      // Update toast
-      duration.reset();
+      dispatch(
+        CreateAnswer(answerData!.type, answerData!.remoteSDP, answerData!.from)
+      );
       // 关闭Notification
       toast.dismiss(toastIdRef.current);
-    }
-    if (mediaCtx.status === 'idle') {
-      setMicrophoneMuted(false);
-      setSpeakerMuted(false);
-      mediaCtx.createOffer();
+    } else {
+      dispatch(CreateOffer('audio', user));
     }
     // 打开语音界面
     dispatch(OpenAudioSider());
-  }, [mediaCtx, dispatch, duration]);
+  }, [dispatch, answerData, status, user]);
 
   const acceptButton = useCallback(
     (size: number, iconSize: number = 28) => (
       <IconButton
         onClick={handleAccept}
-        loading={mediaCtx.loading}
+        loading={loading}
         shape='circle'
         type='primary'
         size={size}
         icon={<Phone size={iconSize} />}
       />
     ),
-    [handleAccept, mediaCtx.loading]
+    [handleAccept, loading]
   );
   const rejectButton = useCallback(
     (size: number, iconSize: number = 28) => (
       <IconButton
         onClick={handleReject}
-        loading={mediaCtx.loading}
+        loading={loading}
         shape='circle'
         danger
         type='primary'
@@ -195,7 +194,7 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
         icon={<PhoneSlash size={iconSize} />}
       />
     ),
-    [handleReject, mediaCtx.loading]
+    [handleReject, loading]
   );
 
   const handleToast = useCallback(() => {
@@ -225,39 +224,40 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
 
   // Update toast timer
   useEffect(() => {
-    if (mediaCtx.status === 'answering') {
+    if (status === 'answering' && type === 'audio') {
       // 收到通话邀请
       handleToast();
     }
-    if (mediaCtx.status === 'calling' && !duration.isRunning) {
+    if (status === 'calling' && !duration.isRunning) {
       // 开始通话
+      duration.reset();
       duration.start();
     }
-    if (mediaCtx.status === 'calling') {
+    if (status === 'calling' && type === 'audio') {
       // 通话中，更新toast中的时间
       updateToastCalling();
     }
+    if (status === 'idle' && toastIdRef.current) {
+      toast.dismiss(toastIdRef.current);
+    }
   }, [
-    mediaCtx.status,
+    status,
     duration,
     duration.seconds,
     updateToastCalling,
     handleToast,
+    type,
   ]);
 
   useEffect(() => {
-    mediaCtx.setOnEnd(() => {
-      return () => {
-        // 对方挂断
-        duration.reset();
-        duration.pause();
-        toast.dismiss(toastIdRef.current);
-        setMicrophoneMuted(false);
-        setSpeakerMuted(false);
-      };
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (duration.isRunning && status === 'idle') {
+      // 对方挂断
+      duration.reset();
+      duration.pause();
+
+      toast.dismiss(toastIdRef.current);
+    }
+  }, [duration, duration.isRunning, status]);
 
   return (
     <Space
@@ -288,26 +288,22 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
           {format(duration)}
         </Typography.Text>
         <Row style={{ gap: 24 }}>
-          {mediaCtx.friendMicMuted && (
+          {remoteDevices.microphone && (
             <MicrophoneSlash color={token.colorTextTertiary} size={18} />
           )}
-          {mediaCtx.friendSpeakerMuted && (
+          {remoteDevices.speaker && (
             <SpeakerSlash color={token.colorTextTertiary} size={18} />
           )}
         </Row>
       </Col>
 
       <audio
+        id='remote-audio'
         style={{ visibility: 'hidden' }}
-        ref={mediaCtx.remoteMediaRef}
-        muted={speakerMuted}
+        muted={localDevices.speaker}
         autoPlay
       />
-      <audio
-        style={{ visibility: 'hidden' }}
-        ref={mediaCtx.localMediaRef}
-        muted
-      />
+      <audio id='local-audio' style={{ visibility: 'hidden' }} muted />
 
       <Col
         style={{
@@ -317,17 +313,17 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
           gap: 32,
         }}
       >
-        {mediaCtx.status === 'calling' && (
+        {status === 'calling' && (
           <Row style={{ justifyContent: 'center', gap: 56 }}>
             <IconButton
               shape='circle'
               size={48}
               onClick={handleMicrophone}
-              type={microphoneMuted ? 'primary' : 'default'}
+              type={localDevices.microphone ? 'primary' : 'default'}
               icon={
                 <Icon
                   component={() =>
-                    microphoneMuted ? (
+                    localDevices.microphone ? (
                       <MicrophoneSlash size={18} />
                     ) : (
                       <Microphone size={18} />
@@ -340,11 +336,11 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
               shape='circle'
               size={48}
               onClick={handleSpeaker}
-              type={speakerMuted ? 'primary' : 'default'}
+              type={localDevices.speaker ? 'primary' : 'default'}
               icon={
                 <Icon
                   component={() =>
-                    speakerMuted ? (
+                    localDevices.speaker ? (
                       <SpeakerSlash size={18} />
                     ) : (
                       <SpeakerHigh size={18} />
@@ -357,7 +353,8 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
         )}
         <Row style={{ width: '100%', gap: 36 }} justify='center'>
           {(() => {
-            switch (mediaCtx.status) {
+            if (type !== 'audio') return acceptButton(64);
+            switch (status) {
               case 'idle':
               case 'producing':
                 return acceptButton(64);

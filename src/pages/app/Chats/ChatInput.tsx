@@ -79,7 +79,7 @@ const ChatInput: FC<ChatInputType> = ({ chatroomId }) => {
 
   const handleSend = () => {
     if (input.trim().length === 0) {
-      toast.error('请输入消息');
+      return toast.error('请输入消息');
     }
     let type = 'text';
     if (/^https?:\/\/(\w+).(.*)$/.test(input)) {

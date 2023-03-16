@@ -11,7 +11,6 @@ const MessageList: FC<{ enableMenu?: boolean; messages: MessageType[] }> = ({
   enableMenu = true,
   messages,
 }) => {
-  const id = messages[messages.length - 1]._id;
   const bottomDivRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = useCallback(() => {
     bottomDivRef.current?.scrollIntoView({ behavior: 'smooth' });
