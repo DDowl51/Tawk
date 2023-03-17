@@ -7,6 +7,7 @@ import {
   Input,
   Space,
   Divider,
+  Skeleton,
 } from 'antd';
 import Icon from '@ant-design/icons';
 import { MagnifyingGlass, ArchiveBox, Users, Plus } from 'phosphor-react';

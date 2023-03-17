@@ -82,6 +82,7 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
     localDevices,
     remoteDevices,
     type,
+    callLogId,
   } = useSelector(selectMedia);
 
   const toastIdRef = useRef<string>('');
@@ -100,15 +101,15 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
   const handleReject = useCallback(() => {
     if (status === 'answering') {
       // 拒绝通话邀请
-      dispatch(EndCall('Reject'));
+      dispatch(EndCall('reject', answerData?.callLogId || callLogId));
     }
     if (status === 'offering') {
       // 取消通话邀请
-      dispatch(EndCall('Cancel'));
+      dispatch(EndCall('cancel', answerData?.callLogId || callLogId));
     }
     if (status === 'calling') {
       // 挂断通话
-      dispatch(EndCall('Hang up'));
+      dispatch(EndCall('hang_up', answerData?.callLogId || callLogId));
       dispatch(CloseMessageSider());
     }
     // 关闭Notification
@@ -116,7 +117,7 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
     // 重置计时器
     duration.reset();
     duration.pause();
-  }, [duration, dispatch, status]);
+  }, [duration, dispatch, status, answerData, callLogId]);
 
   const updateToastCalling = useCallback(() => {
     toastIdRef.current = updateToast(
@@ -158,7 +159,12 @@ const AudioChat: FC<AudioChatProps> = ({ user }) => {
     if (status === 'answering') {
       //  同意通话邀请
       dispatch(
-        CreateAnswer(answerData!.type, answerData!.remoteSDP, answerData!.from)
+        CreateAnswer(
+          answerData!.type,
+          answerData!.remoteSDP,
+          answerData!.from,
+          answerData!.callLogId
+        )
       );
       // 关闭Notification
       toast.dismiss(toastIdRef.current);

@@ -10,12 +10,13 @@ export interface User extends BaseModel {
   avatar?: string;
   online: boolean;
   about: string;
-  friends: Omit<User, 'friends'>[];
+  friends: string[];
+  callLogs: string[];
 }
 
 export interface FriendRequest extends BaseModel {
-  sender: User;
-  recipient: User;
+  sender: string;
+  recipient: string;
   accepted: boolean;
   handled: boolean;
   requestTimes: number;
@@ -24,7 +25,7 @@ export interface FriendRequest extends BaseModel {
 interface BaseChatroom extends BaseModel {
   type: 'single' | 'group';
   messages: MessageType[];
-  users: User[];
+  users: string[];
   lastMessage: MessageType;
   pinned: boolean;
 }
@@ -86,6 +87,14 @@ export interface LinkMessage extends NormalMessage {
 }
 export type MessageType = TextMessage | ImgMessage | FileMessage | LinkMessage;
 
+export interface CallLog extends BaseModel {
+  type: 'video' | 'audio';
+  duration: number; // seconds
+  sender: string;
+  recipient: string;
+  missed: boolean;
+}
+
 // ------------------------- Socket.IO Events -------------------------
 // socket.emit(...)
 export const ServerEvents = {
@@ -121,10 +130,22 @@ export const WebRTCEvents = {
   Speaker: 'webrtc:speaker',
 } as const;
 
+export type WebRTCEndReasons =
+  | 'time_out'
+  | 'reject'
+  | 'hang_up'
+  | 'offline'
+  | 'cancel'
+  | 'unknown';
+
 // ------------------------- Data from server -------------------------
 export interface BaseReturnType {
   status: string;
   message?: string;
+}
+
+export interface GetUserByIdReturnType extends BaseReturnType {
+  user: User;
 }
 
 export interface LoginReturnType extends BaseReturnType {
@@ -140,4 +161,8 @@ export interface SearchUsersReturnType extends BaseReturnType {
 
 export interface GetChatroomReturnType extends BaseReturnType {
   chatroom: Chatroom;
+}
+
+export interface GetFriendsReturnType extends BaseReturnType {
+  friends: User[];
 }

@@ -1,5 +1,6 @@
 import {
   GetChatroomReturnType,
+  GetFriendsReturnType,
   LoginReturnType,
   RegisterReturnType,
   SearchUsersReturnType,
@@ -56,7 +57,9 @@ export const VerifyOTP = async (email: string, otp: string) => {
 };
 
 export const SearchUsers = async (query: string) => {
-  const { data } = await server.get<SearchUsersReturnType>(`/user/${query}`);
+  const { data } = await server.get<SearchUsersReturnType>(
+    `/user/search/${query}`
+  );
   return data;
 };
 
@@ -77,5 +80,13 @@ export const GetChatroomById = async (chatroomId: string, token: string) => {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+  return data;
+};
+
+export const GetFriends = async (token: string) => {
+  const { data } = await server.get<GetFriendsReturnType>('/user/friends', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
   return data;
 };

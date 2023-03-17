@@ -19,7 +19,7 @@ const VideoChat: FC<VideoChatProps> = ({ user }) => {
   const [noteOpen, setNoteOpen] = useState(false); // 来电提醒通知框是否已经打开
 
   const videoToastRef = useRef<string>('');
-  const { targetUser, answerData, status, loading, type } =
+  const { targetUser, answerData, status, loading, type, callLogId } =
     useSelector(selectMedia);
 
   const title = targetUser
@@ -32,15 +32,20 @@ const VideoChat: FC<VideoChatProps> = ({ user }) => {
 
   const handleReject = useCallback(() => {
     // 拒绝通话邀请
-    dispatch(EndCall('Reject'));
+    dispatch(EndCall('reject', answerData?.callLogId || callLogId));
     // 关闭Notification
     toast.dismiss(videoToastRef.current);
-  }, [dispatch]);
+  }, [dispatch, answerData, callLogId]);
 
   const handleAccept = useCallback(() => {
     //  同意通话邀请
     dispatch(
-      CreateAnswer(answerData!.type, answerData!.remoteSDP, answerData!.from)
+      CreateAnswer(
+        answerData!.type,
+        answerData!.remoteSDP,
+        answerData!.from,
+        answerData!.callLogId
+      )
     );
     // 关闭Notification
     toast.dismiss(videoToastRef.current);
@@ -49,7 +54,7 @@ const VideoChat: FC<VideoChatProps> = ({ user }) => {
   }, [dispatch, answerData]);
 
   const handleHangUp = () => {
-    dispatch(EndCall('Hang up'));
+    dispatch(EndCall('hang_up', answerData?.callLogId || callLogId));
     dispatch(CloseMessageSider());
   };
 

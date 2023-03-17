@@ -1,8 +1,11 @@
 import { socket } from 'hooks/useSocket';
 import toast from 'react-hot-toast';
 import { AppThunk } from 'store';
-import { User, WebRTCEvents } from 'types';
+import { AddCallLog } from 'store/data/data.action';
+import { CloseMessageSider } from 'store/ui/ui.action';
+import { User, WebRTCEndReasons, WebRTCEvents } from 'types';
 import {
+  setCallLogId,
   setLoading,
   setLocalDevices,
   setLocalMediaId,
@@ -101,11 +104,17 @@ export const CreateOffer =
     _pc?.setLocalDescription(localSDP);
 
     // send local sdp to remote end
-    socket.emit(WebRTCEvents.Offer, {
-      type,
-      sdp: localSDP,
-      to: targetUser._id,
-    });
+    socket.emit(
+      WebRTCEvents.Offer,
+      {
+        type,
+        sdp: localSDP,
+        to: targetUser._id,
+      },
+      (callLogId: string) => {
+        dispatch(setCallLogId(callLogId));
+      }
+    );
     dispatch(setLoading(false));
   };
 
@@ -113,7 +122,8 @@ export const CreateAnswer =
   (
     type: 'audio' | 'video',
     remoteSDP: RTCSessionDescriptionInit,
-    from: Omit<User, 'friends'>
+    from: Omit<User, 'friends'>,
+    callLogId: string
   ): AppThunk =>
   async (dispatch, getState) => {
     // set status and loading
@@ -155,6 +165,7 @@ export const CreateAnswer =
       {
         sdp: localSDP,
         to: from._id,
+        callLogId,
       },
       // callback after socket return
       () => {
@@ -188,7 +199,7 @@ export const AddCandidate =
 // 断开连接, 不需要通知对方
 // Hang up 之后调用， 或者收到对方Hang up 时调用
 export const CloseConnection =
-  (reason: string): AppThunk =>
+  (reason: WebRTCEndReasons): AppThunk =>
   (dispatch, getState) => {
     dispatch(setStatus('idle'));
     dispatch(setLoading(false));
@@ -217,14 +228,21 @@ export const CloseConnection =
   };
 
 export const EndCall =
-  (reason: string = 'Unknown'): AppThunk =>
+  (reason: WebRTCEndReasons = 'unknown', callLogId: string): AppThunk =>
   (dispatch, getState) => {
     const { targetUser } = getState().media;
     // tell the remote end rejected
-    socket.emit(WebRTCEvents.EndCall, {
-      to: targetUser?._id,
-      reason: reason,
-    });
+    socket.emit(
+      WebRTCEvents.EndCall,
+      {
+        to: targetUser?._id,
+        reason: reason,
+        callLogId,
+      },
+      (callLogId: string) => {
+        dispatch(AddCallLog(callLogId));
+      }
+    );
 
     // close connection
     dispatch(CloseConnection(reason));

@@ -5,6 +5,7 @@ import io, { Socket } from 'socket.io-client';
 import { useAppDispatch } from 'store';
 import { selectAuth } from 'store/auth/auth.slice';
 import {
+  AddCallLog,
   AddChatroom,
   AddMessage,
   AddUserFriend,
@@ -18,6 +19,7 @@ import {
   GroupChatroom,
   MessageType,
   User,
+  WebRTCEndReasons,
   WebRTCEvents,
 } from 'types';
 import {
@@ -94,6 +96,7 @@ const SocketInit = () => {
           remoteSDP: RTCSessionDescriptionInit;
           from: User;
           type: 'audio' | 'video';
+          callLogId: string;
         }) => {
           if (status !== 'idle') {
             socket.emit(WebRTCEvents.EndCall, {
@@ -110,7 +113,7 @@ const SocketInit = () => {
           dispatch(setTargetUser(data.from));
           // auto reject on 60s
           const rejectTimer = setTimeout(() => {
-            dispatch(EndCall('Time out'));
+            dispatch(EndCall('time_out', data.callLogId));
             dispatch(setTimer(null));
           }, 60000);
           dispatch(setTimer(rejectTimer));
@@ -132,11 +135,15 @@ const SocketInit = () => {
         dispatch(AddCandidate(candidate));
       });
 
-      socket.on(WebRTCEvents.EndCall, (reason: string) => {
-        dispatch(CloseConnection(reason));
-      });
+      socket.on(
+        WebRTCEvents.EndCall,
+        (data: { reason: WebRTCEndReasons; callLogId: string }) => {
+          dispatch(CloseConnection(data.reason));
+          dispatch(AddCallLog(data.callLogId));
+        }
+      );
 
-      socket.on(WebRTCEvents.Error, (reason: string) => {
+      socket.on(WebRTCEvents.Error, (reason: WebRTCEndReasons) => {
         dispatch(CloseConnection(reason));
       });
 

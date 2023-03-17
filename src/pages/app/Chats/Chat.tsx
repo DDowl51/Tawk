@@ -1,4 +1,13 @@
-import { Layout, theme, Row, Space, Typography, Button, Divider } from 'antd';
+import {
+  Layout,
+  theme,
+  Row,
+  Space,
+  Typography,
+  Button,
+  Divider,
+  Skeleton,
+} from 'antd';
 import Icon from '@ant-design/icons';
 import Avatar from 'components/Avatar';
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
@@ -18,6 +27,7 @@ import { selectAuth } from 'store/auth/auth.slice';
 import VideoChat from './VideoChat';
 import { selectUI } from 'store/ui/ui.slice';
 import AudioChat from './AudioChat';
+import { useGetUserByIdQuery } from 'store/services';
 
 const Chat = () => {
   const { token } = theme.useToken();
@@ -26,13 +36,13 @@ const Chat = () => {
   const { messageSider } = useSelector(selectUI);
   const {
     conversation: { currentSingleChatroomId, chatrooms },
-    user,
   } = useSelector(selectData);
   const chatroom = chatrooms.find(
     room => room._id === currentSingleChatroomId
   )!;
-  const friend = chatroom?.users.find(u => u._id !== userId)!;
-  const updatedFriend = user?.friends.find(f => f._id === friend?._id)!;
+  const friendId = chatroom?.users.find(uId => uId !== userId)!;
+
+  const { data: friend, error, isLoading } = useGetUserByIdQuery(friendId);
 
   return (
     <Layout style={{ height: '100vh' }} hasSider>
@@ -51,24 +61,34 @@ const Chat = () => {
             style={{ width: '100%', alignItems: 'center' }}
           >
             <Row style={{ alignItems: 'center', gap: 12 }}>
-              <Avatar
-                style={{ cursor: 'pointer' }}
-                onClick={() => dispatch(SwitchChatSider())}
-                src={updatedFriend.avatar}
-                alt={updatedFriend.name}
-                online={updatedFriend.online}
-              />
-              <Space.Compact direction='vertical' style={{ lineHeight: 1 }}>
-                <Typography.Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                  {updatedFriend.name}
-                </Typography.Text>
-                <Typography.Text
-                  type='secondary'
-                  style={{ fontSize: 8, fontWeight: 'bold' }}
-                >
-                  {updatedFriend.online ? 'Online' : 'Offline'}
-                </Typography.Text>
-              </Space.Compact>
+              {error ? (
+                <>{error}</>
+              ) : isLoading ? (
+                <Skeleton avatar paragraph={{ rows: 1 }} />
+              ) : friend ? (
+                <>
+                  <Avatar
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => dispatch(SwitchChatSider())}
+                    src={friend.avatar}
+                    alt={friend.name}
+                    online={friend.online}
+                  />
+                  <Space.Compact direction='vertical' style={{ lineHeight: 1 }}>
+                    <Typography.Text
+                      style={{ fontSize: 14, fontWeight: 'bold' }}
+                    >
+                      {friend.name}
+                    </Typography.Text>
+                    <Typography.Text
+                      type='secondary'
+                      style={{ fontSize: 8, fontWeight: 'bold' }}
+                    >
+                      {friend.online ? 'Online' : 'Offline'}
+                    </Typography.Text>
+                  </Space.Compact>
+                </>
+              ) : null}
             </Row>
             <Row align='middle' style={{ gap: 8 }}>
               <Button
@@ -122,36 +142,44 @@ const Chat = () => {
               <MessageList messages={chatroom?.messages || []} />
             </Layout.Content>
             {/* Video & Audio Chat */}
-            <Layout.Sider
-              style={{
-                backgroundColor: token.colorBgElevated,
-                boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
-              }}
-              trigger={null}
-              defaultCollapsed
-              reverseArrow
-              collapsed={!messageSider.open || messageSider.type !== 'video'}
-              collapsible
-              collapsedWidth={0}
-              width={messageSider.width}
-            >
-              <VideoChat user={updatedFriend} />;
-            </Layout.Sider>
-            <Layout.Sider
-              style={{
-                backgroundColor: token.colorBgElevated,
-                boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
-              }}
-              trigger={null}
-              defaultCollapsed
-              reverseArrow
-              collapsed={!messageSider.open || messageSider.type !== 'audio'}
-              collapsible
-              collapsedWidth={0}
-              width={messageSider.width}
-            >
-              <AudioChat user={updatedFriend} />;
-            </Layout.Sider>
+            {friend && (
+              <>
+                <Layout.Sider
+                  style={{
+                    backgroundColor: token.colorBgElevated,
+                    boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
+                  }}
+                  trigger={null}
+                  defaultCollapsed
+                  reverseArrow
+                  collapsed={
+                    !messageSider.open || messageSider.type !== 'video'
+                  }
+                  collapsible
+                  collapsedWidth={0}
+                  width={messageSider.width}
+                >
+                  <VideoChat user={friend} />;
+                </Layout.Sider>
+                <Layout.Sider
+                  style={{
+                    backgroundColor: token.colorBgElevated,
+                    boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
+                  }}
+                  trigger={null}
+                  defaultCollapsed
+                  reverseArrow
+                  collapsed={
+                    !messageSider.open || messageSider.type !== 'audio'
+                  }
+                  collapsible
+                  collapsedWidth={0}
+                  width={messageSider.width}
+                >
+                  <AudioChat user={friend} />;
+                </Layout.Sider>
+              </>
+            )}
           </Layout>
         </Layout.Content>
         <Layout.Footer

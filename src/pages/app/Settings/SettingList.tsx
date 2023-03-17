@@ -17,6 +17,8 @@ import {
 import { useMemo, useState } from 'react';
 import ThemeModal from './ThemeModal';
 import ShortcutModal from './ShortcutModal';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -41,6 +43,8 @@ const getItem = (
 const SettingList = () => {
   const [themeOpen, setThemeOpen] = useState(false);
   const [shortcutOpen, setShortcutOpen] = useState(false);
+
+  const { user } = useSelector(selectData);
 
   const handleThemeOpen = () => {
     setThemeOpen(true);
@@ -98,10 +102,10 @@ const SettingList = () => {
           wrap={false}
           align='middle'
         >
-          <Avatar size={64} src={faker.image.avatar()} />
+          <Avatar size={64} src={user?.avatar} />
           <Space direction='vertical' size={1}>
             <Typography.Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-              {faker.name.fullName()}
+              {user?.name}
             </Typography.Text>
             <Typography.Paragraph
               ellipsis={{ rows: 2 }}

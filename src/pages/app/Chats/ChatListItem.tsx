@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Typography, Row, Col, theme, Button, Dropdown } from 'antd';
+import { Typography, Row, Col, theme, Button, Dropdown, Skeleton } from 'antd';
 import Avatar from 'components/Avatar';
 import { Chatroom } from 'types';
 import { useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import { dateTo } from 'utils/dayjs';
 import { selectData, setCurrentSingleChatroomId } from 'store/data/data.slice';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { PinChatroom, UnpinChatroom } from 'store/data/data.action';
+import { useGetUserByIdQuery } from 'store/services';
 
 type ChatListItemProps = {
   chatroom: Chatroom;
@@ -20,13 +21,13 @@ const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
   const { token } = theme.useToken();
   const {
     conversation: { currentSingleChatroomId },
-    user,
   } = useSelector(selectData);
   const { users } = chatroom;
-  const friend = users.find(u => u._id !== userId);
-  const updatedFriend = user?.friends.find(f => f._id === friend?._id);
+  const friendId = users.find(uId => uId !== userId)!;
 
   const isCurrentChatroom = currentSingleChatroomId === chatroom._id;
+
+  const { data: friend, error, isLoading } = useGetUserByIdQuery(friendId);
 
   const handleSetCurrentTarget = () => {
     dispatch(setCurrentSingleChatroomId(chatroom._id));
@@ -54,49 +55,58 @@ const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
 
   return (
     <Dropdown menu={{ items: messageMenu }} trigger={['contextMenu']}>
-      <Button
-        onClick={handleSetCurrentTarget}
-        style={{
-          display: 'flex',
-          backgroundColor: isCurrentChatroom
-            ? token.colorPrimaryBg
-            : token.colorBgContainer,
-          padding: 12,
-          borderRadius: 8,
-          cursor: 'pointer',
-          width: '100%',
-          height: 'auto',
-        }}
-      >
-        <Col style={{ display: 'flex', alignItems: 'center', marginRight: 12 }}>
-          <Avatar src={updatedFriend!.avatar} online={updatedFriend!.online} />
-        </Col>
-        <Col flex='1'>
-          <Row justify='space-between'>
-            <Typography.Text style={{ fontWeight: 'bold', lineHeight: 1.5 }}>
-              {updatedFriend!.name}
-            </Typography.Text>
-            <Typography.Text type='secondary' style={{ fontWeight: 'bold' }}>
-              {chatroom.lastMessage?.createdAt &&
-                dateTo(chatroom.lastMessage.createdAt)}
-            </Typography.Text>
-          </Row>
-          <Row>
-            <Typography.Text
-              style={{
-                fontSize: 8,
-                margin: 0,
-                fontWeight: 'bold',
-                maxWidth: 180,
-              }}
-              type='secondary'
-              ellipsis
-            >
-              {chatroom.lastMessage?.text}
-            </Typography.Text>
-          </Row>
-        </Col>
-      </Button>
+      {error ? (
+        <>{error}</>
+      ) : isLoading ? (
+        <Skeleton avatar paragraph={{ rows: 0 }} />
+      ) : friend ? (
+        <Button
+          onClick={handleSetCurrentTarget}
+          style={{
+            display: 'flex',
+            backgroundColor: isCurrentChatroom
+              ? token.colorPrimaryBg
+              : token.colorBgContainer,
+            padding: 12,
+            borderRadius: 8,
+            cursor: 'pointer',
+            width: '100%',
+            height: 'auto',
+            flexWrap: 'nowrap',
+          }}
+        >
+          <Col
+            style={{ display: 'flex', alignItems: 'center', marginRight: 12 }}
+          >
+            <Avatar src={friend.avatar} online={friend.online} />
+          </Col>
+          <Col flex='1'>
+            <Row justify='space-between'>
+              <Typography.Text style={{ fontWeight: 'bold', lineHeight: 1.5 }}>
+                {friend.name}
+              </Typography.Text>
+              <Typography.Text type='secondary' style={{ fontWeight: 'bold' }}>
+                {chatroom.lastMessage?.createdAt &&
+                  dateTo(chatroom.lastMessage.createdAt)}
+              </Typography.Text>
+            </Row>
+            <Row>
+              <Typography.Text
+                style={{
+                  fontSize: 8,
+                  margin: 0,
+                  fontWeight: 'bold',
+                  maxWidth: 180,
+                }}
+                type='secondary'
+                ellipsis
+              >
+                {chatroom.lastMessage?.text}
+              </Typography.Text>
+            </Row>
+          </Col>
+        </Button>
+      ) : null}
     </Dropdown>
   );
 };

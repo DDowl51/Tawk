@@ -7,6 +7,7 @@ import {
   User,
 } from 'types';
 import {
+  addCallLog,
   addChatroom,
   addFriendRequest,
   addMessage,
@@ -14,8 +15,9 @@ import {
   pinChatroom,
   setCurrentGroupChatroomId,
   setCurrentSingleChatroomId,
+  setFriendOffline,
+  setFriendOnline,
   setFriendRequest,
-  setFriendState,
   setLastMesasge,
 } from './data.slice';
 import * as Request from 'requests';
@@ -23,11 +25,11 @@ import * as Request from 'requests';
 export const SetFriendOnline =
   (friendId: string): AppThunk =>
   (dispatch, getState) => {
-    dispatch(setFriendState({ friendId, online: true }));
+    dispatch(setFriendOnline(friendId));
   };
 
 export const AddUserFriend =
-  (friend: User): AppThunk =>
+  (friend: string): AppThunk =>
   (dispatch, getState) => {
     dispatch(addUserFriend(friend));
   };
@@ -35,7 +37,13 @@ export const AddUserFriend =
 export const SetFriendOffline =
   (friendId: string): AppThunk =>
   (dispatch, getState) => {
-    dispatch(setFriendState({ friendId, online: false }));
+    dispatch(setFriendOffline(friendId));
+  };
+
+export const AddCallLog =
+  (callLogId: string): AppThunk =>
+  (dispatch, getState) => {
+    dispatch(addCallLog(callLogId));
   };
 
 export const ReceivedFriendRequest =
@@ -74,7 +82,7 @@ export const SetSingleChatroom =
   async (dispatch, getState) => {
     const { chatrooms } = getState().data.conversation;
     const chatroomExists = chatrooms.find(room =>
-      room.users.find(u => u._id === userId)
+      room.users.find(uId => uId === userId)
     );
 
     // chatroom already exists, just switch current target

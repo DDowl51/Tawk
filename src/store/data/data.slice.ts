@@ -10,6 +10,7 @@ export interface DataState {
     currentGroupChatroomId: string | null;
     chatrooms: Chatroom[];
   };
+  onlineFriends: string[];
 }
 
 const initialState: DataState = {
@@ -20,6 +21,7 @@ const initialState: DataState = {
     currentGroupChatroomId: null,
     chatrooms: [],
   },
+  onlineFriends: [],
 };
 
 const slice = createSlice({
@@ -30,20 +32,23 @@ const slice = createSlice({
     setUser(state, action: PayloadAction<typeof initialState.user>) {
       state.user = action.payload;
     },
-    addUserFriend(state, action: PayloadAction<User>) {
+    addUserFriend(state, action: PayloadAction<string>) {
       if (!state.user) return;
       state.user.friends.push(action.payload);
     },
-    setFriendState(
-      state,
-      action: PayloadAction<{ friendId: string; online: boolean }>
-    ) {
-      if (!state.user) return;
-      const friend = state.user.friends.find(
-        f => f._id === action.payload.friendId
-      );
-      if (!friend) return;
-      friend.online = action.payload.online;
+    setFriendOnline(state, action: PayloadAction<string>) {
+      if (state.onlineFriends.find(id => id === action.payload)) return;
+      else state.onlineFriends.push(action.payload);
+    },
+    setFriendOffline(state, action: PayloadAction<string>) {
+      if (!state.onlineFriends.find(id => id === action.payload)) return;
+      else
+        state.onlineFriends = state.onlineFriends.filter(
+          id => id !== action.payload
+        );
+    },
+    addCallLog(state, action: PayloadAction<string>) {
+      state.user?.callLogs.push(action.payload);
     },
     // -- FriendRequest
     addFriendRequest(
@@ -111,7 +116,9 @@ export const {
   clearFriendRequest,
   setUser,
   addUserFriend,
-  setFriendState,
+  setFriendOnline,
+  setFriendOffline,
+  addCallLog,
   setCurrentSingleChatroomId,
   setCurrentGroupChatroomId,
   setChatrooms,

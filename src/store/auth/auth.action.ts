@@ -27,6 +27,7 @@ export const Login =
       );
       dispatch(login({ userId: user._id, token }));
       dispatch(setUser(user));
+
       // Get GroupChatrooms Info
     } catch (error) {
       toast.error((error as Error).message);

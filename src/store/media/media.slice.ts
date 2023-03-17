@@ -13,12 +13,14 @@ export interface MediaState {
   loading: boolean;
   timer: NodeJS.Timer | null;
   targetUser: Omit<User, 'friends'> | null;
+  callLogId: string;
   localMediaId: string;
   remoteMediaId: string;
   answerData: {
     remoteSDP: RTCSessionDescriptionInit;
     from: User;
     type: 'audio' | 'video';
+    callLogId: string;
   } | null;
   localDevices: DeviceStatus;
   remoteDevices: DeviceStatus;
@@ -30,6 +32,7 @@ const initialState: MediaState = {
   loading: false,
   timer: null,
   targetUser: null,
+  callLogId: '',
   localMediaId: '',
   remoteMediaId: '',
   answerData: null,
@@ -63,6 +66,9 @@ const slice = createSlice({
     setTargetUser(state, action: PayloadAction<MediaState['targetUser']>) {
       state.targetUser = action.payload;
     },
+    setCallLogId(state, action: PayloadAction<MediaState['callLogId']>) {
+      state.callLogId = action.payload;
+    },
     setLocalMediaId(state, action: PayloadAction<string>) {
       state.localMediaId = action.payload;
     },
@@ -94,6 +100,7 @@ export const {
   setLoading,
   setTimer,
   setTargetUser,
+  setCallLogId,
   setLocalMediaId,
   setRemoteMediaId,
   setAnswerData,

@@ -16,10 +16,13 @@ import SimpleBarStyle from 'components/SimpleBarStyle';
 import { CallLogs } from 'data';
 import CallListItem from './CallListItem';
 import NewCallModal from './NewCallModal';
+import { useSelector } from 'react-redux';
+import { selectData } from 'store/data/data.slice';
 // import CreateGroupModal from './CreateGroupModal';
 
 const CallList = () => {
   const { token } = theme.useToken();
+  const { user } = useSelector(selectData);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -72,9 +75,13 @@ const CallList = () => {
         <SimpleBarStyle
           style={{ height: '100%', overflow: 'auto', color: 'white' }}
         >
-          <Space direction='vertical' style={{ width: '100%' }} size={16}>
-            {CallLogs.map(item => (
-              <CallListItem key={item.id} item={item} />
+          <Space
+            direction='vertical'
+            style={{ width: '100%', flexDirection: 'column-reverse' }}
+            size={16}
+          >
+            {user?.callLogs.map(logId => (
+              <CallListItem key={logId} logId={logId} />
             ))}
           </Space>
         </SimpleBarStyle>

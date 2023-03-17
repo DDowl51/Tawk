@@ -26,7 +26,7 @@ const FriendsList = () => {
   return (
     <List
       dataSource={user?.friends}
-      renderItem={item => <FriendsItem user={item} />}
+      renderItem={item => <FriendsItem userId={item} />}
       split
     />
   );

@@ -27,7 +27,7 @@ const NewCallModal: FC<NewCallModalType> = ({ open, handleCancel }) => {
       <SimpleBarStyle style={{ height: 500 }}>
         <Space direction='vertical' size={8} style={{ width: '100%' }}>
           {user?.friends.map(f => (
-            <NewCallItem key={f._id} item={f} />
+            <NewCallItem key={f} userId={f} />
           ))}
         </Space>
       </SimpleBarStyle>

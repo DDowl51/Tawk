@@ -74,11 +74,14 @@ const CreateGroupModal = () => {
             mode='multiple'
             optionFilterProp='label'
             allowClear
-            options={user?.friends.map(f => ({
-              label: f.name,
-              value: f._id,
-            }))}
-          />
+            loading
+            // options={user?.friends.map(f => ({
+            //   label: f,
+            //   value: f,
+            // }))}
+          >
+            <Select.Option>{user?.friends[0]}</Select.Option>
+          </Select>
         </Form.Item>
         <Row justify='end'>
           <Space>

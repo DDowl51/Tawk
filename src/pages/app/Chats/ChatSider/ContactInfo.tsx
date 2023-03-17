@@ -6,6 +6,7 @@ import {
   Image,
   Layout,
   Row,
+  Skeleton,
   Space,
   Switch,
   theme,
@@ -28,6 +29,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from 'store';
 import { selectData } from 'store/data/data.slice';
+import { useGetUserByIdQuery } from 'store/services';
 import { SetChatSider, SwitchChatSider } from 'store/ui/ui.action';
 import BlockDialog from './BlockDialog';
 import DeleteDialog from './DeleteDialog';
@@ -41,10 +43,11 @@ const ContactInfo = () => {
     user,
   } = useSelector(selectData);
 
-  const currentTargetId = chatrooms
+  const friendId = chatrooms
     .find(room => room._id === currentSingleChatroomId)!
-    .users.find(u => u._id !== user?._id)?._id;
-  const currentTarget = user?.friends.find(f => f._id === currentTargetId);
+    .users.find(uId => uId !== user!._id)!;
+
+  const { data: friend, error, isLoading } = useGetUserByIdQuery(friendId);
 
   const [muted, setMuted] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
@@ -91,22 +94,26 @@ const ContactInfo = () => {
           <Space direction='vertical' size={16} style={{ width: '100%' }}>
             {/* Contact Info Row */}
             <Row wrap={false} align='middle' style={{ gap: 16 }}>
-              <Avatar
-                size={64}
-                src={currentTarget?.avatar}
-                alt='Contact avatar'
-              />
-              <Space direction='vertical' size={1}>
-                <Typography.Text
-                  ellipsis={{ tooltip: faker.name.fullName() }}
-                  style={{ fontSize: 16, fontWeight: 'bold', width: 180 }}
-                >
-                  {currentTarget?.name}
-                </Typography.Text>
-                <Typography.Text style={{ fontWeight: '600' }}>
-                  {currentTarget?.email}
-                </Typography.Text>
-              </Space>
+              {error ? (
+                <>{error}</>
+              ) : isLoading ? (
+                <Skeleton avatar paragraph={{ rows: 2 }} />
+              ) : friend ? (
+                <>
+                  <Avatar size={64} src={friend.avatar} alt='Contact avatar' />
+                  <Space direction='vertical' size={1}>
+                    <Typography.Text
+                      ellipsis={{ tooltip: faker.name.fullName() }}
+                      style={{ fontSize: 16, fontWeight: 'bold', width: 180 }}
+                    >
+                      {friend.name}
+                    </Typography.Text>
+                    <Typography.Text style={{ fontWeight: '600' }}>
+                      {friend.email}
+                    </Typography.Text>
+                  </Space>
+                </>
+              ) : null}
             </Row>
 
             {/* Audio & Video Call Row */}
