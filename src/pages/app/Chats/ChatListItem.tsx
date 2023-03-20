@@ -1,5 +1,14 @@
 import { FC } from 'react';
-import { Typography, Row, Col, theme, Button, Dropdown, Skeleton } from 'antd';
+import {
+  Typography,
+  Row,
+  Col,
+  theme,
+  Button,
+  Dropdown,
+  Skeleton,
+  Badge,
+} from 'antd';
 import Avatar from 'components/Avatar';
 import { Chatroom } from 'types';
 import { useSelector } from 'react-redux';
@@ -10,6 +19,8 @@ import { selectData, setCurrentSingleChatroomId } from 'store/data/data.slice';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { PinChatroom, UnpinChatroom } from 'store/data/data.action';
 import { useGetUserByIdQuery } from 'store/services';
+import { selectSettings } from 'store/settings/settings.slice';
+import { BellSlash } from 'phosphor-react';
 
 type ChatListItemProps = {
   chatroom: Chatroom;
@@ -22,12 +33,18 @@ const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
   const {
     conversation: { currentSingleChatroomId },
   } = useSelector(selectData);
+  const { mutedFriends } = useSelector(selectSettings);
   const { users } = chatroom;
   const friendId = users.find(uId => uId !== userId)!;
-
   const isCurrentChatroom = currentSingleChatroomId === chatroom._id;
-
   const { data: friend, error, isLoading } = useGetUserByIdQuery(friendId);
+
+  const unreadCount = chatroom.messages.reduce(
+    (acc, msg) => (msg.read || msg.sender._id === userId ? acc : acc + 1),
+    0
+  );
+
+  const muted = mutedFriends.includes(friendId);
 
   const handleSetCurrentTarget = () => {
     dispatch(setCurrentSingleChatroomId(chatroom._id));
@@ -82,15 +99,20 @@ const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
           </Col>
           <Col flex='1'>
             <Row justify='space-between'>
-              <Typography.Text style={{ fontWeight: 'bold', lineHeight: 1.5 }}>
-                {friend.name}
-              </Typography.Text>
+              <Row align='middle' style={{ gap: 6 }}>
+                <Typography.Text
+                  style={{ fontWeight: 'bold', lineHeight: 1.5 }}
+                >
+                  {friend.name}
+                </Typography.Text>
+                {muted && <BellSlash color={token.colorTextTertiary} />}
+              </Row>
               <Typography.Text type='secondary' style={{ fontWeight: 'bold' }}>
                 {chatroom.lastMessage?.createdAt &&
                   dateTo(chatroom.lastMessage.createdAt)}
               </Typography.Text>
             </Row>
-            <Row>
+            <Row justify='space-between'>
               <Typography.Text
                 style={{
                   fontSize: 8,
@@ -103,6 +125,12 @@ const ChatListItem: FC<ChatListItemProps> = ({ chatroom }) => {
               >
                 {chatroom.lastMessage?.text}
               </Typography.Text>
+              <Badge
+                count={unreadCount}
+                style={{
+                  backgroundColor: muted ? token.colorTextTertiary : undefined,
+                }}
+              />
             </Row>
           </Col>
         </Button>

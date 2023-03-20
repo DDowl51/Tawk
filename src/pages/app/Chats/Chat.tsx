@@ -7,6 +7,7 @@ import {
   Button,
   Divider,
   Skeleton,
+  Badge,
 } from 'antd';
 import Icon from '@ant-design/icons';
 import Avatar from 'components/Avatar';
@@ -24,16 +25,17 @@ import {
 import ChatSider from './ChatSider';
 import { selectData } from 'store/data/data.slice';
 import { selectAuth } from 'store/auth/auth.slice';
-import VideoChat from './VideoChat';
+import VideoChat from './Media/VideoChat';
 import { selectUI } from 'store/ui/ui.slice';
-import AudioChat from './AudioChat';
+import AudioChat from './Media/AudioChat';
 import { useGetUserByIdQuery } from 'store/services';
+import { useState } from 'react';
 
 const Chat = () => {
   const { token } = theme.useToken();
   const dispatch = useDispatch<AppDispatch>();
   const { userId } = useSelector(selectAuth);
-  const { messageSider } = useSelector(selectUI);
+  const { messageSider, chatSider } = useSelector(selectUI);
   const {
     conversation: { currentSingleChatroomId, chatrooms },
   } = useSelector(selectData);
@@ -43,6 +45,12 @@ const Chat = () => {
   const friendId = chatroom?.users.find(uId => uId !== userId)!;
 
   const { data: friend, error, isLoading } = useGetUserByIdQuery(friendId);
+
+  const [shouldScroll, setShouldScroll] = useState(false);
+
+  const scrollToBottom = () => {
+    setShouldScroll(true);
+  };
 
   return (
     <Layout style={{ height: '100vh' }} hasSider>
@@ -138,7 +146,7 @@ const Chat = () => {
         <Layout.Content style={{ width: '100%' }}>
           <Layout style={{ height: '100%' }}>
             {/* MessageList */}
-            <Layout.Content>
+            <Layout.Content style={{ position: 'relative' }}>
               <MessageList messages={chatroom?.messages || []} />
             </Layout.Content>
             {/* Video & Audio Chat */}
@@ -194,7 +202,21 @@ const Chat = () => {
       </Layout>
 
       {/* Chat Sider to show contact info */}
-      <ChatSider />
+      <Layout.Sider
+        trigger={null}
+        width={330}
+        theme='light'
+        collapsed={!chatSider.open}
+        collapsedWidth={0}
+        defaultCollapsed
+        collapsible
+        reverseArrow
+        style={{
+          boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
+        }}
+      >
+        <ChatSider />
+      </Layout.Sider>
     </Layout>
   );
 };

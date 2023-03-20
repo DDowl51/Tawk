@@ -76,16 +76,16 @@ const Sider = () => {
       { type: 'divider' },
       getItem(
         'Setting',
-        PATH_DASHBOARD.app.settings,
-        <NavLink to={PATH_DASHBOARD.app.settings}>
+        PATH_DASHBOARD.app.settings.root,
+        <NavLink to={PATH_DASHBOARD.app.settings.root}>
           <Icon component={() => <GearSix size={18} />} />
         </NavLink>
       ),
       getItem(
         'Logout',
         'sider-logout',
-        <NavLink to={PATH_DASHBOARD.app.settings}>
-          <Icon component={() => <GearSix size={18} />} />
+        <NavLink to={PATH_DASHBOARD.app.settings.root}>
+          <Icon component={() => <SignOut size={18} />} />
         </NavLink>,
         () => dispatch(Logout())
       ),
@@ -105,7 +105,7 @@ const Sider = () => {
         'Settings',
         `${PATH_DASHBOARD.app.settings}-profile`,
         <Icon component={() => <GearSix size={16} />} />,
-        () => navigate(PATH_DASHBOARD.app.settings)
+        () => navigate(PATH_DASHBOARD.app.settings.root)
       ),
       getItem(
         'Logout',

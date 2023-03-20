@@ -25,18 +25,43 @@ import {
   VideoCamera,
   X,
 } from 'phosphor-react';
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from 'store';
+import { FC, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from 'store';
 import { selectData } from 'store/data/data.slice';
-import { useGetUserByIdQuery } from 'store/services';
-import { SetChatSider, SwitchChatSider } from 'store/ui/ui.action';
+import {
+  useGetCommonChatroomsQuery,
+  useGetUserByIdQuery,
+} from 'store/services';
+import { MuteFriend, UnmuteFriend } from 'store/settings/settings.action';
+import { selectSettings } from 'store/settings/settings.slice';
+import {
+  OpenAudioSider,
+  OpenVideoSider,
+  SetChatSider,
+  SwitchChatSider,
+} from 'store/ui/ui.action';
+import { GroupChatroom } from 'types';
 import BlockDialog from './BlockDialog';
 import DeleteDialog from './DeleteDialog';
 
+const Group: FC<{ group: GroupChatroom }> = ({ group }) => {
+  return (
+    <Row wrap={false} align='middle' style={{ gap: 16 }}>
+      <Avatar alt='Contact avatar' />
+      <Typography.Text
+        ellipsis={{ tooltip: faker.name.fullName() }}
+        style={{ fontSize: 16, fontWeight: 'bold', width: 200 }}
+      >
+        {group.name}
+      </Typography.Text>
+    </Row>
+  );
+};
+
 const ContactInfo = () => {
   const { token } = theme.useToken();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const {
     conversation: { currentSingleChatroomId, chatrooms },
@@ -47,14 +72,41 @@ const ContactInfo = () => {
     .find(room => room._id === currentSingleChatroomId)!
     .users.find(uId => uId !== user!._id)!;
 
-  const { data: friend, error, isLoading } = useGetUserByIdQuery(friendId);
+  const {
+    data: commonGroups,
+    error: groupsError,
+    isLoading: groupsLoading,
+  } = useGetCommonChatroomsQuery(friendId);
+  const {
+    data: friend,
+    error: friendError,
+    isLoading: friendLoading,
+  } = useGetUserByIdQuery(friendId);
+  const { mutedFriends } = useSelector(selectSettings);
+  const muted = mutedFriends.includes(friendId);
+  const handleMute = () => {
+    if (muted) {
+      dispatch(UnmuteFriend(friendId));
+    } else {
+      dispatch(MuteFriend(friendId));
+    }
+  };
 
-  const [muted, setMuted] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
   const handleBlockCancel = () => setBlockOpen(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const handleDeleteCancel = () => setDeleteOpen(false);
+
+  const handleAudioCall = () => {
+    dispatch(OpenAudioSider());
+    dispatch(SetChatSider(false, 'contact'));
+  };
+
+  const handleVideoCall = () => {
+    dispatch(OpenVideoSider());
+    dispatch(SetChatSider(false, 'contact'));
+  };
 
   return (
     <Layout
@@ -94,9 +146,9 @@ const ContactInfo = () => {
           <Space direction='vertical' size={16} style={{ width: '100%' }}>
             {/* Contact Info Row */}
             <Row wrap={false} align='middle' style={{ gap: 16 }}>
-              {error ? (
-                <>{error}</>
-              ) : isLoading ? (
+              {friendError ? (
+                <>{friendError}</>
+              ) : friendLoading ? (
                 <Skeleton avatar paragraph={{ rows: 2 }} />
               ) : friend ? (
                 <>
@@ -120,6 +172,7 @@ const ContactInfo = () => {
             <Row style={{ width: '100%', justifyContent: 'space-evenly' }}>
               <Tooltip title='Voice' placement='bottom'>
                 <Button
+                  onClick={handleAudioCall}
                   shape='circle'
                   size='large'
                   type='text'
@@ -128,6 +181,7 @@ const ContactInfo = () => {
               </Tooltip>
               <Tooltip title='Video' placement='bottom'>
                 <Button
+                  onClick={handleVideoCall}
                   shape='circle'
                   size='large'
                   type='text'
@@ -227,7 +281,7 @@ const ContactInfo = () => {
             {/* Mute Notification Row */}
             <Row>
               <Row
-                onClick={() => setMuted(prev => !prev)}
+                onClick={handleMute}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -253,22 +307,16 @@ const ContactInfo = () => {
             {/* Common Group Row */}
             <Row style={{ gap: 16 }}>
               <Typography.Text style={{ fontSize: 16 }}>
-                1 group in common
+                {commonGroups?.length} group
+                {commonGroups && commonGroups?.length >= 2 && 's'} in common
               </Typography.Text>
-              <Row wrap={false} align='middle' style={{ gap: 16 }}>
-                <Avatar src={faker.image.avatar()} alt='Contact avatar' />
-                <Space direction='vertical' size={1}>
-                  <Typography.Text
-                    ellipsis={{ tooltip: faker.name.fullName() }}
-                    style={{ fontSize: 16, fontWeight: 'bold', width: 200 }}
-                  >
-                    Tawk
-                  </Typography.Text>
-                  <Typography.Text style={{ fontWeight: '600' }}>
-                    Owl, Parrot, Rabbit, You
-                  </Typography.Text>
-                </Space>
-              </Row>
+              {groupsError ? (
+                <>{groupsError}</>
+              ) : groupsLoading ? (
+                <Skeleton avatar paragraph={{ rows: 0 }} />
+              ) : commonGroups ? (
+                commonGroups.map(g => <Group group={g} />)
+              ) : null}
             </Row>
 
             {/* Action Row */}

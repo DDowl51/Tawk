@@ -1,4 +1,5 @@
 import { Layout, theme } from 'antd';
+import { Outlet } from 'react-router';
 import SettingList from './SettingList';
 
 const Settings = () => {
@@ -15,7 +16,9 @@ const Settings = () => {
       >
         <SettingList />
       </Layout.Sider>
-      <Layout.Content>Settings</Layout.Content>
+      <Layout.Content>
+        <Outlet />
+      </Layout.Content>
     </Layout>
   );
 };

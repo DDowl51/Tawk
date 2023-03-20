@@ -1,5 +1,6 @@
 import {
   GetChatroomReturnType,
+  GetChatroomsReturnType,
   GetFriendsReturnType,
   LoginReturnType,
   RegisterReturnType,
@@ -85,6 +86,26 @@ export const GetChatroomById = async (chatroomId: string, token: string) => {
 
 export const GetFriends = async (token: string) => {
   const { data } = await server.get<GetFriendsReturnType>('/user/friends', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return data;
+};
+
+export const ReadMessage = async (messageId: string, token: string) => {
+  const { data } = await server.patch(
+    `/message/${messageId}`,
+    {}, // req.body
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
+  return data;
+};
+
+export const GetUserChatrooms = async (token: string) => {
+  const { data } = await server.get<GetChatroomsReturnType>('/chatroom/user', {
     headers: { Authorization: `Bearer ${token}` },
   });
 

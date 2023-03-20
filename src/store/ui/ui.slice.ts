@@ -6,6 +6,10 @@ export interface UIState {
     open: boolean;
     type: 'contact' | 'starred' | 'shared';
   };
+  groupSider: {
+    open: boolean;
+    type: 'info' | 'photo' | 'file' | 'link';
+  };
   friendsDialog: {
     open: boolean;
   };
@@ -17,12 +21,19 @@ export interface UIState {
     type: 'video' | 'audio';
     width: string;
   };
+  addAdminModal: {
+    open: boolean;
+  };
 }
 
 const initialState: UIState = {
   chatSider: {
     open: false,
     type: 'contact',
+  },
+  groupSider: {
+    open: false,
+    type: 'info',
   },
   friendsDialog: {
     open: false,
@@ -36,14 +47,20 @@ const initialState: UIState = {
     type: 'video',
     width: '50%',
   },
+  addAdminModal: {
+    open: false,
+  },
 };
 
 const slice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    setChatSider(state, action: PayloadAction<typeof initialState.chatSider>) {
+    setChatSider(state, action: PayloadAction<UIState['chatSider']>) {
       state.chatSider = action.payload;
+    },
+    setGroupSider(state, action: PayloadAction<UIState['groupSider']>) {
+      state.groupSider = action.payload;
     },
     setFriendsDialog(state, action: PayloadAction<boolean>) {
       state.friendsDialog.open = action.payload;
@@ -53,12 +70,15 @@ const slice = createSlice({
     },
     setMessageSider(
       state,
-      action: PayloadAction<Partial<typeof initialState.messageSider>>
+      action: PayloadAction<Partial<UIState['messageSider']>>
     ) {
       state.messageSider.open = action.payload.open ?? state.messageSider.open;
       state.messageSider.type = action.payload.type ?? state.messageSider.type;
       state.messageSider.width =
         action.payload.width ?? state.messageSider.width;
+    },
+    setAddAdminModal(state, action: PayloadAction<boolean>) {
+      state.addAdminModal.open = action.payload;
     },
   },
 });
@@ -66,8 +86,10 @@ const slice = createSlice({
 export const selectUI = (state: RootState) => state.ui;
 export const {
   setChatSider,
+  setGroupSider,
   setFriendsDialog,
   setCreateGroupDialog,
   setMessageSider,
+  setAddAdminModal,
 } = slice.actions;
 export default slice.reducer;

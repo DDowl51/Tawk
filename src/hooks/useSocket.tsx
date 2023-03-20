@@ -38,12 +38,22 @@ import {
   HandleAnswer,
   SetRemote,
 } from 'store/media/media.action';
+import useNotification from './useNotification';
+import Avatar from 'components/Avatar';
+import { selectData } from 'store/data/data.slice';
+import { selectSettings } from 'store/settings/settings.slice';
 
 export let socket: Socket;
 
 const SocketInit = () => {
   const { token } = useSelector(selectAuth);
   const dispatch = useAppDispatch();
+  const {
+    conversation: { currentSingleChatroomId, currentGroupChatroomId },
+  } = useSelector(selectData);
+  const { mutedFriends } = useSelector(selectSettings);
+
+  const { notify } = useNotification();
 
   const { status } = useSelector(selectMedia);
 
@@ -66,9 +76,7 @@ const SocketInit = () => {
       socket.on(ClientEvents.HandleFriendRequest, (request: FriendRequest) => {
         dispatch(AddUserFriend(request.recipient));
       });
-      socket.on(ClientEvents.NewMessage, (message: MessageType) => {
-        dispatch(AddMessage(message));
-      });
+
       socket.on(ClientEvents.FriendOnline, (fId: string) => {
         dispatch(SetFriendOnline(fId));
       });
@@ -85,7 +93,26 @@ const SocketInit = () => {
         socket.disconnect();
       }
     };
-  }, [token, dispatch]);
+  }, [token, dispatch, notify]);
+
+  // avoid frequently reconnection of socket
+  useEffect(() => {
+    if (socket) {
+      socket.on(ClientEvents.NewMessage, (message: MessageType) => {
+        dispatch(AddMessage(message));
+        if (mutedFriends.includes(message.sender._id)) return;
+        notify(
+          `${message.sender.name}: ${message.text}`,
+          'blank',
+          <Avatar src={message.sender.avatar} />
+        );
+      });
+    }
+
+    return () => {
+      socket.off(ClientEvents.NewMessage);
+    };
+  }, [dispatch, notify, mutedFriends]);
 
   useEffect(() => {
     // ---------- WebRTC events
@@ -98,6 +125,7 @@ const SocketInit = () => {
           type: 'audio' | 'video';
           callLogId: string;
         }) => {
+          console.log('on offer');
           if (status !== 'idle') {
             socket.emit(WebRTCEvents.EndCall, {
               type: data.type,

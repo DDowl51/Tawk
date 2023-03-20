@@ -13,6 +13,7 @@ import {
   addMessage,
   addUserFriend,
   pinChatroom,
+  readMessage,
   setCurrentGroupChatroomId,
   setCurrentSingleChatroomId,
   setFriendOffline,
@@ -132,6 +133,15 @@ export const AddMessage =
       dispatch(AddChatroom(chatroom));
     }
 
-    dispatch(addMessage(message));
+    dispatch(addMessage({ ...message, read: false }));
     dispatch(setLastMesasge(message));
+  };
+
+export const ReadMessage =
+  (message: MessageType): AppThunk =>
+  async (dispatch, getState) => {
+    if (message.sender._id === getState().auth.userId || message.read) return;
+    await Request.ReadMessage(message._id, getState().auth.token);
+
+    dispatch(readMessage(message));
   };

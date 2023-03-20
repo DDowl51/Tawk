@@ -9,34 +9,16 @@ import StarredMessages from './StarredMessages';
 const ChatSider = () => {
   const { chatSider } = useSelector(selectUI);
 
-  return (
-    <Layout.Sider
-      trigger={null}
-      width={330}
-      theme='light'
-      collapsed={!chatSider.open}
-      collapsedWidth={0}
-      defaultCollapsed
-      collapsible
-      reverseArrow
-      style={{
-        boxShadow: '0 0 2px rgba(0, 0, 0, 0.25)',
-      }}
-    >
-      {(() => {
-        switch (chatSider.type) {
-          case 'contact':
-            return <ContactInfo />;
-          case 'shared':
-            return <SharedMessages />;
-          case 'starred':
-            return <StarredMessages />;
-          default:
-            return <ContactInfo />;
-        }
-      })()}
-    </Layout.Sider>
-  );
+  switch (chatSider.type) {
+    case 'contact':
+      return <ContactInfo />;
+    case 'shared':
+      return <SharedMessages />;
+    case 'starred':
+      return <StarredMessages />;
+    default:
+      return <ContactInfo />;
+  }
 };
 
 export default ChatSider;

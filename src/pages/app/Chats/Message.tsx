@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useEffect } from 'react';
 import {
   Row,
   Divider,
@@ -25,6 +25,10 @@ import {
 import { useSelector } from 'react-redux';
 import { selectAuth } from 'store/auth/auth.slice';
 import { useNavigate } from 'react-router';
+import useInView from 'react-hook-inview/dist/useInView';
+import { useAppDispatch } from 'store';
+import React from 'react';
+import { ReadMessage } from 'store/data/data.action';
 
 type MessageProps<MsgType extends MessageType> = {
   message: MsgType;
@@ -105,8 +109,18 @@ const MessageBody: FC<PropsWithChildren<MessageBodyProps>> = ({
   const { token } = theme.useToken();
   const { userId } = useSelector(selectAuth);
   const isSender = message.sender._id === userId;
+
+  const [ref, isVisible] = useInView();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (isVisible && !message.read) {
+      dispatch(ReadMessage(message));
+    }
+  }, [dispatch, isVisible, message]);
+
   return (
-    <Row style={{ margin: 8, ...style, willChange: 'auto' }}>
+    <Row ref={ref} style={{ margin: 8, ...style, willChange: 'auto' }}>
       <Space.Compact direction='vertical' style={{ width: '100%' }}>
         {!isSender && (
           <Row justify='start'>

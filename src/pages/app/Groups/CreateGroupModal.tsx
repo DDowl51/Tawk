@@ -1,10 +1,11 @@
-import { Button, Form, Input, Modal, Row, Select, Space } from 'antd';
+import { Button, Form, Input, Modal, Row, Select, Space, Spin } from 'antd';
 import { useSocket } from 'hooks/useSocket';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from 'store';
 import { AddChatroom } from 'store/data/data.action';
 import { selectData } from 'store/data/data.slice';
+import { useGetUserFriendsQuery } from 'store/services';
 import { CloseCreateGroupDialog } from 'store/ui/ui.action';
 import { selectUI } from 'store/ui/ui.slice';
 import { GroupChatroom, ServerEvents } from 'types';
@@ -18,6 +19,8 @@ const CreateGroupModal = () => {
   const [form] = Form.useForm<FormValues>();
   const socket = useSocket();
   const dispatch = useAppDispatch();
+
+  const { data, error, isLoading } = useGetUserFriendsQuery(null);
 
   const [loading, setLoading] = useState(false);
   const {
@@ -39,8 +42,6 @@ const CreateGroupModal = () => {
     );
     dispatch(CloseCreateGroupDialog());
   };
-
-  const { user } = useSelector(selectData);
 
   return (
     <Modal
@@ -74,13 +75,19 @@ const CreateGroupModal = () => {
             mode='multiple'
             optionFilterProp='label'
             allowClear
-            loading
-            // options={user?.friends.map(f => ({
-            //   label: f,
-            //   value: f,
-            // }))}
+            loading={isLoading}
           >
-            <Select.Option>{user?.friends[0]}</Select.Option>
+            {error ? (
+              <>{error}</>
+            ) : isLoading ? (
+              <Spin />
+            ) : data ? (
+              data.map(f => (
+                <Select.Option key={f._id} value={f._id} label={f.name}>
+                  {f.name}
+                </Select.Option>
+              ))
+            ) : null}
           </Select>
         </Form.Item>
         <Row justify='end'>

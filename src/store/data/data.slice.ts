@@ -106,6 +106,15 @@ const slice = createSlice({
       );
       chatroom?.messages.push(action.payload);
     },
+    readMessage(state, action: PayloadAction<MessageType>) {
+      const chatroom = state.conversation.chatrooms.find(
+        room => room._id === action.payload.chatroomId
+      )!;
+      const message = chatroom.messages.find(
+        msg => msg._id === action.payload._id
+      );
+      if (message) message.read = true;
+    },
   },
 });
 
@@ -126,5 +135,6 @@ export const {
   setLastMesasge,
   addChatroom,
   addMessage,
+  readMessage,
 } = slice.actions;
 export default slice.reducer;

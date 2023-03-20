@@ -1,8 +1,7 @@
 import Icon from '@ant-design/icons';
 import { Button, Row, Typography, Space } from 'antd';
-import toast from 'react-hot-toast';
-import { Phone, PhoneSlash, X } from 'phosphor-react';
-import React, { FC, useEffect, useCallback, useState, useRef } from 'react';
+import { X } from 'phosphor-react';
+import React, { FC, useCallback } from 'react';
 import { useAppDispatch } from 'store';
 import { CloseMessageSider, OpenVideoSider } from 'store/ui/ui.action';
 import { User } from 'types';
@@ -16,9 +15,7 @@ type VideoChatProps = {
 
 const VideoChat: FC<VideoChatProps> = ({ user }) => {
   const dispatch = useAppDispatch();
-  const [noteOpen, setNoteOpen] = useState(false); // 来电提醒通知框是否已经打开
 
-  const videoToastRef = useRef<string>('');
   const { targetUser, answerData, status, loading, type, callLogId } =
     useSelector(selectMedia);
 
@@ -33,8 +30,6 @@ const VideoChat: FC<VideoChatProps> = ({ user }) => {
   const handleReject = useCallback(() => {
     // 拒绝通话邀请
     dispatch(EndCall('reject', answerData?.callLogId || callLogId));
-    // 关闭Notification
-    toast.dismiss(videoToastRef.current);
   }, [dispatch, answerData, callLogId]);
 
   const handleAccept = useCallback(() => {
@@ -47,8 +42,6 @@ const VideoChat: FC<VideoChatProps> = ({ user }) => {
         answerData!.callLogId
       )
     );
-    // 关闭Notification
-    toast.dismiss(videoToastRef.current);
     // 打开视频界面
     dispatch(OpenVideoSider());
   }, [dispatch, answerData]);
@@ -57,73 +50,6 @@ const VideoChat: FC<VideoChatProps> = ({ user }) => {
     dispatch(EndCall('hang_up', answerData?.callLogId || callLogId));
     dispatch(CloseMessageSider());
   };
-
-  // Update countdown of reject on the notification bar
-  useEffect(() => {
-    if (status === 'answering' && type === 'video') {
-      console.log(type);
-      videoToastRef.current = toast.loading(
-        <Space>
-          <Typography.Text style={{ fontSize: 16, fontWeight: 'bold' }}>
-            Someone is calling you
-          </Typography.Text>
-          <Space>
-            <Button
-              size='large'
-              shape='circle'
-              type='primary'
-              onClick={handleAccept}
-              icon={<Icon component={() => <Phone />} />}
-            />
-            <Button
-              onClick={handleReject}
-              size='large'
-              shape='circle'
-              type='primary'
-              danger
-              icon={<Icon component={() => <PhoneSlash />} />}
-            />
-          </Space>
-        </Space>,
-        {
-          id: videoToastRef.current,
-        }
-      );
-    }
-  }, [status, handleAccept, handleReject, type]);
-
-  useEffect(() => {
-    if (!noteOpen && status === 'answering' && type === 'video') {
-      setNoteOpen(true);
-      videoToastRef.current = toast.loading(
-        <Space>
-          <Typography.Text style={{ fontSize: 16, fontWeight: 'bold' }}>
-            Someone is calling you
-          </Typography.Text>
-          <Space>
-            <Button
-              size='large'
-              shape='circle'
-              type='primary'
-              onClick={handleAccept}
-              icon={<Icon component={() => <Phone />} />}
-            />
-            <Button
-              onClick={handleReject}
-              size='large'
-              shape='circle'
-              type='primary'
-              danger
-              icon={<Icon component={() => <PhoneSlash />} />}
-            />
-          </Space>
-        </Space>,
-        {
-          id: videoToastRef.current,
-        }
-      );
-    }
-  }, [status, noteOpen, handleAccept, handleReject, type]);
 
   return (
     <Row style={{ height: '100%', width: '100%', padding: 12 }}>

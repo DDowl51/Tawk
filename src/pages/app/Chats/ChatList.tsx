@@ -22,10 +22,13 @@ import { selectData } from 'store/data/data.slice';
 import { useAppDispatch } from 'store';
 import { OpenFriendsDialog } from 'store/ui/ui.action';
 import dayjs from 'dayjs';
+import { useGetUserFriendsQuery } from 'store/services';
+import { Chatroom } from 'types';
 
 const ChatList = () => {
   const { conversation } = useSelector(selectData);
   const dispatch = useAppDispatch();
+  const [searchPattern, setSearchPattern] = useState('');
   const sortedChatrooms = useMemo(() => {
     const chatrooms = [...conversation.chatrooms].filter(
       room => room.type === 'single'
@@ -40,6 +43,32 @@ const ChatList = () => {
       return dayjs(b.lastMessage.createdAt).diff(a.lastMessage.createdAt);
     });
   }, [conversation.chatrooms]);
+  const { data: friends } = useGetUserFriendsQuery(null);
+
+  const searchFilter = (chatrooms: Chatroom[]) => {
+    return chatrooms.filter(r => {
+      if (!searchPattern.trim().length || !friends) {
+        return true;
+      } else {
+        const reg = new RegExp(
+          searchPattern
+            .replace('\\', '\\\\')
+            .replace('*', '\\*')
+            .replace('.', '\\.')
+            .replace('(', '\\(')
+            .replace(')', '\\)')
+            .replace('[', '\\[')
+            .replace(']', '\\]')
+            .replace('+', '\\+')
+            .replace('?', '\\?')
+        );
+        const filtered = friends.filter(
+          f => reg.test(f.name) || reg.test(f.email)
+        );
+        return filtered.find(f => r.users.includes(f._id));
+      }
+    });
+  };
 
   const pinnedChatrooms = useMemo(
     () => sortedChatrooms.filter(room => room.pinned),
@@ -88,6 +117,9 @@ const ChatList = () => {
             </Row>
           </Row>
           <Input
+            allowClear
+            value={searchPattern}
+            onChange={e => setSearchPattern(e.target.value)}
             prefix={<Icon component={() => <MagnifyingGlass />} />}
             size='large'
             placeholder='Search...'
@@ -122,7 +154,7 @@ const ChatList = () => {
             )}
             {/* Pinned ChatListItem */}
             <Space direction='vertical' style={{ width: '100%' }} size={16}>
-              {pinnedChatrooms.map(room => (
+              {searchFilter(pinnedChatrooms).map(room => (
                 <ChatListItem key={room._id} chatroom={room} />
               ))}
             </Space>
@@ -141,7 +173,7 @@ const ChatList = () => {
             {/* All ChatListItem */}
             {
               <Space direction='vertical' style={{ width: '100%' }} size={16}>
-                {unpinnedChatrooms.map(room => (
+                {searchFilter(unpinnedChatrooms).map(room => (
                   <ChatListItem key={room._id} chatroom={room} />
                 ))}
               </Space>

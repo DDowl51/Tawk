@@ -4,12 +4,13 @@ import { UserOutlined } from '@ant-design/icons';
 
 const Avatar: FC<AvatarProps & { online?: boolean }> = ({
   online,
+  size = 48,
   ...props
 }) => {
   return (
     <Badge
       dot
-      offset={[-6, 42]}
+      offset={[((size as number) / 48) * -18, ((size as number) / 48) * 40]}
       color='green'
       showZero={false}
       count={online ? 1 : 0}
@@ -17,7 +18,7 @@ const Avatar: FC<AvatarProps & { online?: boolean }> = ({
     >
       <AntAvatar
         icon={<UserOutlined />}
-        size={props.size || 48}
+        size={size || 48}
         src={props.src}
         alt={props.alt}
         {...props}

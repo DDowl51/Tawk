@@ -201,6 +201,11 @@ export const AddCandidate =
 export const CloseConnection =
   (reason: WebRTCEndReasons): AppThunk =>
   (dispatch, getState) => {
+    const { timer } = getState().media;
+    if (timer) {
+      clearTimeout(timer);
+    }
+
     dispatch(setStatus('idle'));
     dispatch(setLoading(false));
     dispatch(setTargetUser(null));

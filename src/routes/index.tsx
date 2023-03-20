@@ -29,7 +29,20 @@ export default function Router() {
         { path: PATH_DASHBOARD.app.chats, element: <ChatsPage /> },
         { path: PATH_DASHBOARD.app.groups, element: <GroupsPage /> },
         { path: PATH_DASHBOARD.app.calls, element: <CallsPage /> },
-        { path: PATH_DASHBOARD.app.settings, element: <SettingsPage /> },
+        {
+          path: PATH_DASHBOARD.app.settings.root,
+          element: <SettingsPage />,
+          children: [
+            {
+              path: PATH_DASHBOARD.app.settings.notification,
+              element: <NotificationSetting />,
+            },
+            {
+              path: '*',
+              element: <Navigate to={PATH_DASHBOARD.app.settings.root} />,
+            },
+          ],
+        },
         { path: PATH_DASHBOARD.app.profile, element: <ProfilePage /> },
         { path: '*', element: <NotFoundPage /> },
       ],
@@ -54,6 +67,11 @@ const GroupsPage = Loadable(lazy(() => import('../pages/app/Groups')));
 const CallsPage = Loadable(lazy(() => import('../pages/app/Calls')));
 const SettingsPage = Loadable(lazy(() => import('../pages/app/Settings')));
 const ProfilePage = Loadable(lazy(() => import('../pages/app/Profile')));
+
+// Settings
+const NotificationSetting = Loadable(
+  lazy(() => import('../pages/app/Settings/Notification'))
+);
 
 // Auth Routes
 const AuthLayout = Loadable(lazy(() => import('../layouts/auth')));

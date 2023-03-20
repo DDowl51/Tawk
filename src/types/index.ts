@@ -51,6 +51,7 @@ export interface BaseMessage {
   chatroomId: string;
   sender: User;
   isSender: boolean;
+  read: boolean;
 }
 
 export interface NormalMessage extends BaseMessage {
@@ -165,4 +166,8 @@ export interface GetChatroomReturnType extends BaseReturnType {
 
 export interface GetFriendsReturnType extends BaseReturnType {
   friends: User[];
+}
+
+export interface GetChatroomsReturnType extends BaseReturnType {
+  chatrooms: Chatroom[];
 }

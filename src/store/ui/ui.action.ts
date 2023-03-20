@@ -1,8 +1,10 @@
 import { AppThunk } from '..';
 import {
+  setAddAdminModal,
   setChatSider,
   setCreateGroupDialog,
   setFriendsDialog,
+  setGroupSider,
   setMessageSider,
 } from './ui.slice';
 
@@ -25,6 +27,27 @@ export const SetChatSider =
   ): AppThunk =>
   (dispatch, _getState) => {
     dispatch(setChatSider({ open, type }));
+  };
+
+export const SwitchGroupSider =
+  (open?: boolean): AppThunk =>
+  (dispatch, getState) => {
+    const groupSider = getState().ui.groupSider;
+    dispatch(
+      setGroupSider({
+        open: open ? open : !groupSider.open,
+        type: groupSider.type,
+      })
+    );
+  };
+
+export const SetGroupSider =
+  (
+    open: boolean,
+    type: 'info' | 'photo' | 'file' | 'link' = 'info'
+  ): AppThunk =>
+  (dispatch, _getState) => {
+    dispatch(setGroupSider({ open, type }));
   };
 
 export const CloseFriendsDialog = (): AppThunk => (dispatch, _getState) => {
@@ -53,4 +76,12 @@ export const OpenAudioSider = (): AppThunk => (dispatch, _getState) => {
 
 export const CloseMessageSider = (): AppThunk => (dispatch, _getState) => {
   dispatch(setMessageSider({ open: false }));
+};
+
+export const OpenAddAdminModal = (): AppThunk => (dispatch, getState) => {
+  dispatch(setAddAdminModal(true));
+};
+
+export const CloseAddAdminModal = (): AppThunk => (dispatch, getState) => {
+  dispatch(setAddAdminModal(false));
 };

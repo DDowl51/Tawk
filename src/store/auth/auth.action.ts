@@ -25,8 +25,10 @@ export const Login =
         formValues.email,
         formValues.password
       );
+      const { chatrooms } = await Requests.GetUserChatrooms(token);
       dispatch(login({ userId: user._id, token }));
       dispatch(setUser(user));
+      dispatch(setChatrooms(chatrooms));
 
       // Get GroupChatrooms Info
     } catch (error) {
