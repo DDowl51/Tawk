@@ -1,6 +1,12 @@
-# Getting Started with Create React App
+# Tawk
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) TS template.
+Tawk is a chat application using React & Ant Design for frontend and mongoose & express for the backend
+
+# Backend
+
+Tawk is using Node.js, mongoose & express for the backend.
+The repo is linked below:
+[Tawk-server](https://github.com/DDowl51/Tawk-server)
 
 ## Available Scripts
 
